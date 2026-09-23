@@ -9,19 +9,18 @@ spring:
   jpa:
     hibernate:
       ddl-auto: update          # 없으면 생성 있다면 변경 된 사항 확인하여 수정
-    show-sql: true              # JPQL로 진행 된 실제 쿼리문 확인용
+    show-sql: false             # JPQL로 진행 된 실제 쿼리문 확인용(로깅 SQL로 확인)
     properties:
       hibernate:
         format_sql: true        # SQL 콘솔 포맷핑 (로그, 콘솔의 SQL을 좀 더 이쁘게 출력)
         highlight_sql: true     # SQL 출력을 ANSI escape codes를 사용하여 색을 부여
         use_sql_comments: true  # 보다 쉬운 디버깅을 위해 SQL 내부에 /* */의 주석을 추가
+      naming:
+        physical-strategy: org.hibernate.boot.model.naming.CamelCaseToUnderscoresNamingStrategy   # 테이블·컬럼명의 CamelCase를 snake_case로 변환
 
 
 logging:
   level:
-    org:
-      hibernate:
-        SQL: debug               # Hibernate가 DB로 날리는 SQL문을 찍어주는 로거
-        type:
-          descriptor:
-            sql: trace           # 쿼리문 바인딩 되는 실제 값 확인
+    org.hibernate:
+      SQL: debug                # 실행되는 SQL 로그 출력
+      orm.jdbc.bind: trace      # ? 에 바인딩되는 실제 값 출력 (Hibernate 6+ 로거명)
