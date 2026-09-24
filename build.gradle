@@ -50,10 +50,18 @@ dependencies {
     // DBDriver : postgresql
     runtimeOnly 'org.postgresql:postgresql'
     annotationProcessor 'org.projectlombok:lombok'
+
+    // QueryDSL: 타입 안전한 동적 쿼리 작성 도구
+    implementation 'io.github.openfeign.querydsl:querydsl-jpa:7.0'          // QueryDSL 본체 (JPAQueryFactory 등 쿼리 작성 기능)
+    annotationProcessor 'io.github.openfeign.querydsl:querydsl-apt:7.0:jpa' // 컴파일 시 @Entity를 찾아 Q클래스(QIndexInformation 등) 자동 생성
+    annotationProcessor "jakarta.annotation:jakarta.annotation-api"         // 생성된 Q클래스에 붙는 @Generated 애노테이션 제공
+    annotationProcessor "jakarta.persistence:jakarta.persistence-api"       // Q클래스 생성기가 @Entity, @Id 등 JPA 애노테이션을 인식하는 데 필요
+
     testImplementation 'org.springframework.boot:spring-boot-starter-data-jdbc-test'
     testCompileOnly 'org.projectlombok:lombok'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
     testAnnotationProcessor 'org.projectlombok:lombok'
+
 }
 
 
