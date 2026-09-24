@@ -1,0 +1,71 @@
+#!/bin/sh
+#
+# ===============================================================
+# [pre-commit 훅] v2
+# ===============================================================
+# 실행 시점 : git commit 시 커밋 메시지 작성 전 (pre-commit → commit-msg → 커밋 완료)
+# 하는 일   : stage된 Java 파일만 대상으로
+#             1. Spotless 포맷 자동 정리 → 다시 stage
+#             2. Checkstyle 규칙 검사 (main, test)
+#             Java 파일이 없는 커밋(문서, 설정만)은 검사 없이 통과
+# 종료 코드 : 0 = 커밋 진행 / 0이 아님 = 커밋 취소
+# 설치      : 원본 scripts/pre-commit → Run(컴파일) 시 .git/hooks/로 자동 복사
+# ===============================================================
+
+HOOK_VERSION="v2"
+
+# ---------------------------------------------------------------
+# 1) 프로젝트 루트로 이동 (경로 공백 대비 "" 필수)
+# ---------------------------------------------------------------
+PROJECT_ROOT="$(git rev-parse --show-toplevel)"
+cd "$PROJECT_ROOT" || exit 1
+
+# ---------------------------------------------------------------
+# 2) stage된 Java 파일 목록 (삭제된 파일 제외)
+# ---------------------------------------------------------------
+stagedJava="$(git diff --staged --name-only --diff-filter=ACMR -- '*.java')"
+
+echo "▶ pre-commit 훅 실행 (${HOOK_VERSION}: stage된 Java 파일만 검사)"
+echo "▶ 검사 대상 Java 파일:"
+if [ -z "$stagedJava" ]; then
+  echo "  (없음)"
+  echo "ℹ️ stage된 Java 파일이 없어 포맷/규칙 검사를 건너뜁니다."
+  exit 0
+fi
+printf '%s\n' "$stagedJava" | sed 's/^/  - /'
+
+# ---------------------------------------------------------------
+# 3) Spotless 포맷 정리 (stage된 파일만)
+# ---------------------------------------------------------------
+# -PspotlessFiles : 포맷할 파일의 절대경로를 쉼표로 구분 (없으면 프로젝트 전체 포맷)
+spotlessFiles="$(printf '%s\n' "$stagedJava" | sed "s#^#${PROJECT_ROOT}/#" | paste -sd, -)"
+
+echo "🚧 Spotless 포맷 정리 중..."
+if ! ./gradlew spotlessApply -PspotlessFiles="$spotlessFiles"; then
+  echo "💥 Spotless 포맷 적용에 실패했습니다! 커밋을 중단합니다." >&2
+  exit 1
+fi
+
+# ---------------------------------------------------------------
+# 4) 포맷 정리된 파일 다시 stage
+# ---------------------------------------------------------------
+# ⚠️ git add -p로 일부만 stage했어도 파일 전체가 다시 stage됨
+printf '%s\n' "$stagedJava" | while IFS= read -r file; do
+  [ -f "$file" ] && git add "$file"
+done
+
+# ---------------------------------------------------------------
+# 5) Checkstyle 규칙 검사 (stage된 파일만)
+# ---------------------------------------------------------------
+# -PcheckstyleIncludes : 소스 폴더 기준 상대경로를 쉼표로 구분 (없으면 전체 검사)
+#   예) src/main/java/com/eunsoly/findex/A.java → com/eunsoly/findex/A.java
+checkstyleIncludes="$(printf '%s\n' "$stagedJava" | sed -e 's#^src/main/java/##' -e 's#^src/test/java/##' | paste -sd, -)"
+
+echo "🔍 Checkstyle 검사 중..."
+if ! ./gradlew checkstyleMain checkstyleTest -PcheckstyleIncludes="$checkstyleIncludes"; then
+  echo "💥 Checkstyle 규칙 위반이 있습니다! build/reports/checkstyle/ 의 main.html, test.html을 확인하세요." >&2
+  exit 1
+fi
+
+echo "✅ 포맷 정리 및 규칙 검사 완료!"
+exit 0
