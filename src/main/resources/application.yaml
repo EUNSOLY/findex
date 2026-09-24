@@ -24,3 +24,11 @@ logging:
     org.hibernate:
       SQL: debug                # 실행되는 SQL 로그 출력
       orm.jdbc.bind: trace      # ? 에 바인딩되는 실제 값 출력 (Hibernate 6+ 로거명)
+
+
+
+
+# 환경 변수 연계
+findex:
+  openapi:
+    key: ${OPEN_API_KEY}
