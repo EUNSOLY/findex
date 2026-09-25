@@ -5,6 +5,7 @@ import com.eunsoly.findex.common.exception.index.IndexException;
 import com.eunsoly.findex.domain.entity.SourceType;
 import com.eunsoly.findex.domain.entity.index.IndexInformation;
 import com.eunsoly.findex.repository.index.IndexInformationRepository;
+import com.eunsoly.findex.repository.index.IndexInformationSummary;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -43,5 +44,10 @@ public class IndexInformationServiceImpl implements IndexInformationService {
     public void deleteInformation(Long id) {
         IndexInformation deletedEntity = this.findById(id);
         indexInformationRepository.delete(deletedEntity);
+    }
+
+    @Override
+    public List<IndexInformationSummary> findSummariesAll() {
+        return indexInformationRepository.findAllSummaries();
     }
 }
