@@ -7,12 +7,17 @@ import com.eunsoly.findex.application.integration.dto.IndexDataPage;
 import com.eunsoly.findex.application.integration.dto.IntegrationHistoryCommand;
 import com.eunsoly.findex.application.integration.dto.SyncIndexDataCommand;
 import com.eunsoly.findex.application.integration.dto.SyncIndexResult;
+import com.eunsoly.findex.application.integration.dto.SyncJobResult;
+import com.eunsoly.findex.application.integration.dto.SyncJobsCommand;
+import com.eunsoly.findex.common.dto.CursorRequest;
 import com.eunsoly.findex.domain.entity.index.IndexData;
 import com.eunsoly.findex.domain.entity.index.IndexInformation;
 import com.eunsoly.findex.domain.entity.integration.IntegrationHistory;
 import com.eunsoly.findex.domain.service.index.IndexDataService;
 import com.eunsoly.findex.domain.service.index.IndexInformationService;
+import com.eunsoly.findex.domain.service.integration.IntegrationHistoryCursorResult;
 import com.eunsoly.findex.domain.service.integration.IntegrationHistoryService;
+import com.eunsoly.findex.repository.integration.IntegrationHistorySearchCondition;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -33,6 +38,34 @@ public class IntegrationApplication {
     private final IndexInformationService indexInformationService;
     private final IntegrationHistoryService integrationHistoryService;
     private final IndexDataService indexDataService;
+
+    public SyncJobResult getSyncJobs(SyncJobsCommand command, CursorRequest cursorRequest) {
+        IntegrationHistorySearchCondition condition =
+                IntegrationHistorySearchCondition.of(
+                        command.jobType(),
+                        command.indexInfoId(),
+                        command.baseDateFrom(),
+                        command.baseDateTo(),
+                        command.worker(),
+                        command.jobTimeFrom(),
+                        command.jobTimeTo(),
+                        command.status(),
+                        cursorRequest.idAfter(),
+                        cursorRequest.cursor(),
+                        cursorRequest.sortField(),
+                        cursorRequest.sortDirection(),
+                        cursorRequest.size());
+
+        IntegrationHistoryCursorResult historyCursorResult =
+                integrationHistoryService.findSyncJobHistories(condition);
+
+        List<SyncIndexResult> syncIndexResults =
+                historyCursorResult.histories().stream()
+                        .map(history -> SyncIndexResult.of(history, history.getIndexInformation()))
+                        .toList();
+
+        return SyncJobResult.of(syncIndexResults, historyCursorResult.cursorPaginationResult());
+    }
 
     public List<SyncIndexResult> syncIndexInfos(String clientIp) {
         List<CreateIndexInformationCommand> indexInfoCommands =
