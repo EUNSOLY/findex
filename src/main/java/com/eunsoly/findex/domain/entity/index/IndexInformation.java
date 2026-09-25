@@ -40,10 +40,8 @@ public class IndexInformation {
     @Column(nullable = false)
     private Integer employedItemsCount; // 채용종목수
 
-    @Column(nullable = false)
     private LocalDate basePointInTime; // 기준시점
 
-    @Column(nullable = false)
     private Float baseIndex; // 기준지수
 
     @Column(nullable = false)
