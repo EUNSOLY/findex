@@ -39,5 +39,9 @@ public class IndexInformationServiceImpl implements IndexInformationService {
                 .orElseThrow(() -> new IndexException(ErrorCode.INDEX_INFO_NOT_FOUND, String.format("잘못된 지수 정보 입니다. 요청 지수정보 ID : %s", id), null));
     }
 
-
+    @Override
+    public void deleteInformation(Long id) {
+        IndexInformation deletedEntity = this.findById(id);
+        indexInformationRepository.delete(deletedEntity);
+    }
 }

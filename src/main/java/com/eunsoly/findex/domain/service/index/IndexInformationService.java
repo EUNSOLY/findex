@@ -13,4 +13,6 @@ public interface IndexInformationService {
     List<IndexInformation> findSyncTargets(List<Long> ids);
 
     IndexInformation findById(Long id);
+
+    void deleteInformation(Long id);
 }

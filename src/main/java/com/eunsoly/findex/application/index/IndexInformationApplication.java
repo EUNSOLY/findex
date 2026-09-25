@@ -39,4 +39,8 @@ public class IndexInformationApplication {
         return IndexInformationResult.of(indexInformation);
 
     }
+
+    public void deleteInformation(Long id) {
+        indexInformationService.deleteInformation(id);
+    }
 }
