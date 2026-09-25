@@ -1,10 +1,15 @@
-package com.eunsoly.findex.common.exception.index;
+package com.eunsoly.findex.common.exception.client;
 
 import com.eunsoly.findex.common.exception.base.ApplicationException;
 import com.eunsoly.findex.common.exception.base.ErrorCode;
+
 import java.util.Map;
 
-public class IndexException extends ApplicationException {
+public class OpenApiException extends ApplicationException {
+
+    protected OpenApiException(ErrorCode errorCode) {
+        this(errorCode, errorCode.getDefaultMessage(), null);
+    }
 
     /**
      * 기본 메시지로 예외를 생성합니다.
@@ -12,7 +17,7 @@ public class IndexException extends ApplicationException {
      * @param errorCode 에러 코드 (HTTP 상태, 기본 메시지, 로그 레벨 포함)
      * @param cause 원인 예외 (외부 API 호출 실패 등)
      */
-    protected IndexException(ErrorCode errorCode, Throwable cause) {
+    protected OpenApiException(ErrorCode errorCode, Throwable cause) {
         this(errorCode, errorCode.getDefaultMessage(), null, cause);
     }
 
@@ -23,7 +28,7 @@ public class IndexException extends ApplicationException {
      * @param message 에러 코드의 기본 메시지 대신 사용할 메시지
      * @param cause 원인 예외
      */
-    protected IndexException(ErrorCode errorCode, String message, Throwable cause) {
+    protected OpenApiException(ErrorCode errorCode, String message, Throwable cause) {
         this(errorCode, message, null, cause);
     }
 
@@ -34,7 +39,7 @@ public class IndexException extends ApplicationException {
      * @param detail 디버깅용 추가 정보 (예: 요청 URL, 지수 ID). 로그와 에러 응답에 포함됨
      * @param cause 원인 예외
      */
-    protected IndexException(ErrorCode errorCode, Map<String, Object> detail, Throwable cause) {
+    protected OpenApiException(ErrorCode errorCode, Map<String, Object> detail, Throwable cause) {
         this(errorCode, errorCode.getDefaultMessage(), detail, cause);
     }
 
@@ -49,7 +54,7 @@ public class IndexException extends ApplicationException {
      * @param detail 디버깅용 추가 정보. {@code null}이면 무시됨
      * @param cause 원인 예외
      */
-    protected IndexException(ErrorCode errorCode, String message, Map<String, Object> detail, Throwable cause) {
+    protected OpenApiException(ErrorCode errorCode, String message, Map<String, Object> detail, Throwable cause) {
         super(errorCode, message, cause);
         if (detail != null) {
             detail.forEach(this::addContext);

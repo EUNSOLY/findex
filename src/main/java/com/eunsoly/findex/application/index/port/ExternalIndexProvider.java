@@ -8,6 +8,5 @@ public interface ExternalIndexProvider {
 
     List<CreateIndexInformationCommand> getOpenApiIndexInfos();
 
-    IndexDataPage getOpenApiIndexData(
-            int pageNo, String indexClassification, String indexName, String from, String to);
+    IndexDataPage getOpenApiIndexData(int pageNo, String indexClassification, String indexName, String from, String to);
 }

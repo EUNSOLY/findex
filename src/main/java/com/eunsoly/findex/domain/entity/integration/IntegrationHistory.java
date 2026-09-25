@@ -11,12 +11,13 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
+
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Entity
 @Getter
@@ -49,10 +50,7 @@ public class IntegrationHistory {
     @Enumerated(value = EnumType.STRING)
     private ResultType result;
 
-    public static IntegrationHistory createSuccessByIndexInfo(
-            IndexInformation indexInformation,
-            LocalDate targetDate,
-            String worker,
+    public static IntegrationHistory createSuccessByIndexInfo(IndexInformation indexInformation, LocalDate targetDate, String worker,
             LocalDateTime jobTime) {
         IntegrationHistory integrationHistory = new IntegrationHistory();
         integrationHistory.indexInformation = indexInformation;
@@ -65,10 +63,7 @@ public class IntegrationHistory {
         return integrationHistory;
     }
 
-    public static IntegrationHistory createFailedByIndexInfo(
-            IndexInformation indexInformation,
-            LocalDate targetDate,
-            String worker,
+    public static IntegrationHistory createFailedByIndexInfo(IndexInformation indexInformation, LocalDate targetDate, String worker,
             LocalDateTime jobTime) {
         IntegrationHistory integrationHistory = new IntegrationHistory();
         integrationHistory.indexInformation = indexInformation;
@@ -81,10 +76,7 @@ public class IntegrationHistory {
         return integrationHistory;
     }
 
-    public static IntegrationHistory createSuccessByIndexData(
-            IndexInformation indexInformation,
-            LocalDate targetDate,
-            String worker,
+    public static IntegrationHistory createSuccessByIndexData(IndexInformation indexInformation, LocalDate targetDate, String worker,
             LocalDateTime jobTime) {
         IntegrationHistory integrationHistory = new IntegrationHistory();
         integrationHistory.indexInformation = indexInformation;
@@ -97,10 +89,7 @@ public class IntegrationHistory {
         return integrationHistory;
     }
 
-    public static IntegrationHistory createFailedByIndexData(
-            IndexInformation indexInformation,
-            LocalDate targetDate,
-            String worker,
+    public static IntegrationHistory createFailedByIndexData(IndexInformation indexInformation, LocalDate targetDate, String worker,
             LocalDateTime jobTime) {
         IntegrationHistory integrationHistory = new IntegrationHistory();
         integrationHistory.indexInformation = indexInformation;

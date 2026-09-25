@@ -11,10 +11,7 @@ public class RestClientConfig {
 
     @Bean
     public RestClient createCustomRestClient() {
-        return RestClient.builder()
-                .baseUrl(
-                        "https://apis.data.go.kr/1160100/GetMarketIndexInfoService_V2/getStockMarketIndex_V2")
-                .defaultHeader(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
-                .build();
+        return RestClient.builder().baseUrl("https://apis.data.go.kr/1160100/GetMarketIndexInfoService_V2/getStockMarketIndex_V2")
+                .defaultHeader(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE).build();
     }
 }

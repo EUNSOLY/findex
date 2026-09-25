@@ -33,17 +33,8 @@ public class OpenApiClientService implements ExternalIndexProvider {
                 break; // 빈 페이지면 종료
             }
 
-            items.getItems().stream()
-                    .map(
-                            item ->
-                                    CreateIndexInformationCommand.of(
-                                            item.getIndexClassification(),
-                                            item.getIndexName(),
-                                            item.getEmployedItemsCount(),
-                                            item.getBasePointInTime(),
-                                            item.getBaseIndex(),
-                                            false))
-                    .forEach(result::add);
+            items.getItems().stream().map(item -> CreateIndexInformationCommand.of(item.getIndexClassification(), item.getIndexName(),
+                    item.getEmployedItemsCount(), item.getBasePointInTime(), item.getBaseIndex(), false)).forEach(result::add);
 
             hasNext = pageNo * numOfRows < totalCount;
             pageNo++;
@@ -54,37 +45,18 @@ public class OpenApiClientService implements ExternalIndexProvider {
     }
 
     @Override
-    public IndexDataPage getOpenApiIndexData(
-            int pageNo,
-            String indexClassification,
-            String indexName,
-            String baseDateFrom,
-            String baseDateTo) {
-        OpenApiResponse res =
-                openApiClient.getIndexDataFromOpenApi(pageNo, indexName, baseDateFrom, baseDateTo);
+    public IndexDataPage getOpenApiIndexData(int pageNo, String indexClassification, String indexName, String baseDateFrom, String baseDateTo) {
+        OpenApiResponse res = openApiClient.getIndexDataFromOpenApi(pageNo, indexName, baseDateFrom, baseDateTo);
         int totalCount = res.getTotalCount();
         long numOfRows = res.getResponse().getBody().getNumOfRows();
         boolean hasNext = pageNo * numOfRows < totalCount;
 
         OpenApiResponse.Items items = res.getItems();
-        List<CreateIndexDataCommand> commands =
-                items.getItems().stream()
-                        .filter(item -> item.getIndexClassification().equals(indexClassification))
-                        .map(
-                                item ->
-                                        CreateIndexDataCommand.of(
-                                                null,
-                                                item.getBaseDate(),
-                                                item.getMarketPrice(),
-                                                item.getClosingPrice(),
-                                                item.getHighPrice(),
-                                                item.getLowPrice(),
-                                                item.getVersus(),
-                                                item.getFluctuationRage(),
-                                                item.getTradingQuantity(),
-                                                item.getTradingPrice(),
-                                                item.getMarketTotalAmount()))
-                        .toList();
+        List<CreateIndexDataCommand> commands = items.getItems().stream().filter(item -> item.getIndexClassification().equals(indexClassification))
+                .map(item -> CreateIndexDataCommand.of(null, item.getBaseDate(), item.getMarketPrice(), item.getClosingPrice(), item.getHighPrice(),
+                        item.getLowPrice(), item.getVersus(), item.getFluctuationRage(), item.getTradingQuantity(), item.getTradingPrice(),
+                        item.getMarketTotalAmount()))
+                .toList();
 
         return IndexDataPage.of(commands, hasNext);
     }

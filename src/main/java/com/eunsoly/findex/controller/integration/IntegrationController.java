@@ -39,57 +39,32 @@ public class IntegrationController {
 
     @ResponseStatus(HttpStatus.ACCEPTED)
     @PostMapping(value = "/api/sync-jobs/index-data")
-    public List<SyncIndexInfoResponse> syncIndexData(
-            @RequestBody SyncIndexDataRequest request, HttpServletRequest httpServletRequest) {
+    public List<SyncIndexInfoResponse> syncIndexData(@RequestBody SyncIndexDataRequest request, HttpServletRequest httpServletRequest) {
         String clientIp = httpServletRequest.getRemoteAddr();
-        List<SyncIndexResult> results =
-                integrationApplication.syncIndexData(request.toCommand(), clientIp);
+        List<SyncIndexResult> results = integrationApplication.syncIndexData(request.toCommand(), clientIp);
 
         return results.stream().map(SyncIndexInfoResponse::of).toList();
     }
 
     @ResponseStatus(HttpStatus.OK)
     @GetMapping(value = "/api/sync-jobs")
-    public CursorPaginationResponse<SyncIndexResult> getSyncJobs(
-            @RequestParam(required = false) String jobType,
+    public CursorPaginationResponse<SyncIndexResult> getSyncJobs(@RequestParam(required = false) String jobType,
             @RequestParam(required = false) Long indexInfoId,
-            @RequestParam(required = false) @DateTimeFormat(pattern = "yyyyMMdd")
-                    LocalDate baseDateFrom,
-            @RequestParam(required = false) @DateTimeFormat(pattern = "yyyyMMdd")
-                    LocalDate baseDateTo,
-            @RequestParam(required = false) String worker,
-            @RequestParam(required = false) LocalDateTime jobTimeFrom,
-            @RequestParam(required = false) LocalDateTime jobTimeTo,
-            @RequestParam(required = false) String status,
-            @RequestParam(required = false) Long idAfter,
-            @RequestParam(required = false) String cursor,
-            @RequestParam(required = false, defaultValue = "jobTime") String sortField,
+            @RequestParam(required = false) @DateTimeFormat(pattern = "yyyyMMdd") LocalDate baseDateFrom,
+            @RequestParam(required = false) @DateTimeFormat(pattern = "yyyyMMdd") LocalDate baseDateTo, @RequestParam(required = false) String worker,
+            @RequestParam(required = false) LocalDateTime jobTimeFrom, @RequestParam(required = false) LocalDateTime jobTimeTo,
+            @RequestParam(required = false) String status, @RequestParam(required = false) Long idAfter,
+            @RequestParam(required = false) String cursor, @RequestParam(required = false, defaultValue = "jobTime") String sortField,
             @RequestParam(required = false, defaultValue = "desc") String sortDirection,
             @RequestParam(required = false, defaultValue = "10") Integer size) {
-        SyncJobsCommand syncJobsCommand =
-                SyncJobsCommand.of(
-                        jobType,
-                        indexInfoId,
-                        baseDateFrom,
-                        baseDateTo,
-                        worker,
-                        jobTimeFrom,
-                        jobTimeTo,
-                        status);
-        CursorRequest cursorPaginationCommand =
-                CursorRequest.of(idAfter, cursor, sortField, sortDirection, size);
+        SyncJobsCommand syncJobsCommand = SyncJobsCommand.of(jobType, indexInfoId, baseDateFrom, baseDateTo, worker, jobTimeFrom, jobTimeTo, status);
+        CursorRequest cursorPaginationCommand = CursorRequest.of(idAfter, cursor, sortField, sortDirection, size);
 
-        SyncJobResult syncJobResult =
-                integrationApplication.getSyncJobs(syncJobsCommand, cursorPaginationCommand);
+        SyncJobResult syncJobResult = integrationApplication.getSyncJobs(syncJobsCommand, cursorPaginationCommand);
         List<SyncIndexResult> content = syncJobResult.content();
         CursorPaginationResult cursorResult = syncJobResult.cursorPaginationResult();
 
-        return CursorPaginationResponse.of(
-                content,
-                cursorResult.nextCursor(),
-                cursorResult.nextIdAfter(),
-                cursorResult.size(),
-                cursorResult.totalElements(),
-                cursorResult.hasNext());
+        return CursorPaginationResponse.of(content, cursorResult.nextCursor(), cursorResult.nextIdAfter(), cursorResult.size(),
+                cursorResult.totalElements(), cursorResult.hasNext());
     }
 }

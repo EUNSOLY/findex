@@ -69,11 +69,11 @@
         <property name="eachLine" value="true"/>
     </module>
 
-    <!-- 한 줄 최대 길이: 120자 (자바 파일만)
+    <!-- 한 줄 최대 길이: 150자 (자바 파일만)
          package, import 줄과 URL이 들어간 줄은 길어도 봐줌 -->
     <module name="LineLength">
         <property name="fileExtensions" value="java"/>
-        <property name="max" value="120"/>
+        <property name="max" value="150"/>
         <property name="ignorePattern" value="^package.*|^import.*|a href|href|http://|https://|ftp://"/>
     </module>
 

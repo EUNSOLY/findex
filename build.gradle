@@ -69,12 +69,10 @@ dependencies {
 // Spotless: 코드 포맷 규칙 설정
 //   ./gradlew spotlessApply : 아래 규칙대로 코드를 자동 수정
 //   ./gradlew spotlessCheck : 규칙 위반 여부만 검사 (수정 X, CI에서 주로 사용)
-// ===============================================================
 spotless {
     // 자바 파일(src/**/*.java)에 적용할 규칙
     java {
-        // 구글 자바 포멧 적용
-        googleJavaFormat().aosp()
+        eclipse().configFile("${rootDir}/config/spotless/java-format.xml")
     }
 }
 

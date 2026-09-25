@@ -5,5 +5,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface IndexInformationRepository
-        extends JpaRepository<IndexInformation, Long>, IndexInformationRepositorySupport {}
+public interface IndexInformationRepository extends JpaRepository<IndexInformation, Long>, IndexInformationRepositorySupport {
+}

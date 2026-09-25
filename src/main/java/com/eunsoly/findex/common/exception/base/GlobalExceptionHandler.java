@@ -13,26 +13,20 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(IndexException.class)
     public ResponseEntity<ErrorResponse> handle(IndexException exception) {
-        log.makeLoggingEventBuilder(exception.getErrorCode().getLevel())
-                .log("지수 도메인 예외 발생 : {}", exception.getMessage(), exception);
+        log.makeLoggingEventBuilder(exception.getErrorCode().getLevel()).log("지수 도메인 예외 발생 : {}", exception.getMessage(), exception);
 
         // 컨텍스트 정보 로깅
-        exception
-                .getContext()
-                .forEach((key, value) -> log.debug("지수 도메인 Context: {} = {}", key, value));
+        exception.getContext().forEach((key, value) -> log.debug("지수 도메인 Context: {} = {}", key, value));
         return ResponseEntity.status(exception.getErrorCode().getHttpStatus())
                 .body(ErrorResponse.fail(exception.getMessage(), exception.getContext()));
     }
 
     @ExceptionHandler(IntegrationException.class)
     public ResponseEntity<ErrorResponse> handle(IntegrationException exception) {
-        log.makeLoggingEventBuilder(exception.getErrorCode().getLevel())
-                .log("연동 작업 도메인 예외 발생 : {}", exception.getMessage(), exception);
+        log.makeLoggingEventBuilder(exception.getErrorCode().getLevel()).log("연동 작업 도메인 예외 발생 : {}", exception.getMessage(), exception);
 
         // 컨텍스트 정보 로깅
-        exception
-                .getContext()
-                .forEach((key, value) -> log.debug("연동 작업 Context: {} = {}", key, value));
+        exception.getContext().forEach((key, value) -> log.debug("연동 작업 Context: {} = {}", key, value));
 
         return ResponseEntity.status(exception.getErrorCode().getHttpStatus())
                 .body(ErrorResponse.fail(exception.getMessage(), exception.getContext()));

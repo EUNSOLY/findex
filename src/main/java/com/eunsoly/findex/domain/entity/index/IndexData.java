@@ -13,12 +13,13 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
-import java.math.BigDecimal;
-import java.time.LocalDate;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
+
+import java.math.BigDecimal;
+import java.time.LocalDate;
 
 @Entity
 @Getter
@@ -69,17 +70,8 @@ public class IndexData {
     @Column(nullable = false)
     private Long marketTotalAmount; // 시가 총액
 
-    private static IndexData baseCreate(
-            IndexInformation indexInformation,
-            LocalDate baseDate,
-            BigDecimal marketPrice,
-            BigDecimal closingPrice,
-            BigDecimal highPrice,
-            BigDecimal lowPrice,
-            BigDecimal versus,
-            BigDecimal fluctuationRate,
-            Long tradingQuantity,
-            Long tradingPrice,
+    private static IndexData baseCreate(IndexInformation indexInformation, LocalDate baseDate, BigDecimal marketPrice, BigDecimal closingPrice,
+            BigDecimal highPrice, BigDecimal lowPrice, BigDecimal versus, BigDecimal fluctuationRate, Long tradingQuantity, Long tradingPrice,
             Long marketTotalAmount) {
         IndexData indexData = new IndexData();
         indexData.indexInformation = indexInformation;
@@ -97,126 +89,44 @@ public class IndexData {
         return indexData;
     }
 
-    public static IndexData createByIntegration(
-            IndexInformation indexInformation,
-            LocalDate baseDate,
-            BigDecimal marketPrice,
-            BigDecimal closingPrice,
-            BigDecimal highPrice,
-            BigDecimal lowPrice,
-            BigDecimal versus,
-            BigDecimal fluctuationRate,
-            Long tradingQuantity,
-            Long tradingPrice,
-            Long marketTotalAmount) {
-        IndexData indexData =
-                IndexData.baseCreate(
-                        indexInformation,
-                        baseDate,
-                        marketPrice,
-                        closingPrice,
-                        highPrice,
-                        lowPrice,
-                        versus,
-                        fluctuationRate,
-                        tradingQuantity,
-                        tradingPrice,
-                        marketTotalAmount);
+    public static IndexData createByIntegration(IndexInformation indexInformation, LocalDate baseDate, BigDecimal marketPrice,
+            BigDecimal closingPrice, BigDecimal highPrice, BigDecimal lowPrice, BigDecimal versus, BigDecimal fluctuationRate, Long tradingQuantity,
+            Long tradingPrice, Long marketTotalAmount) {
+        IndexData indexData = IndexData.baseCreate(indexInformation, baseDate, marketPrice, closingPrice, highPrice, lowPrice, versus,
+                fluctuationRate, tradingQuantity, tradingPrice, marketTotalAmount);
         indexData.sourceType = SourceType.OPEN_API;
 
         return indexData;
     }
 
-    public static IndexData createByUser(
-            IndexInformation indexInformation,
-            LocalDate baseDate,
-            BigDecimal marketPrice,
-            BigDecimal closingPrice,
-            BigDecimal highPrice,
-            BigDecimal lowPrice,
-            BigDecimal versus,
-            BigDecimal fluctuationRate,
-            Long tradingQuantity,
-            Long tradingPrice,
+    public static IndexData createByUser(IndexInformation indexInformation, LocalDate baseDate, BigDecimal marketPrice, BigDecimal closingPrice,
+            BigDecimal highPrice, BigDecimal lowPrice, BigDecimal versus, BigDecimal fluctuationRate, Long tradingQuantity, Long tradingPrice,
             Long marketTotalAmount) {
-        IndexData indexData =
-                IndexData.baseCreate(
-                        indexInformation,
-                        baseDate,
-                        marketPrice,
-                        closingPrice,
-                        highPrice,
-                        lowPrice,
-                        versus,
-                        fluctuationRate,
-                        tradingQuantity,
-                        tradingPrice,
-                        marketTotalAmount);
+        IndexData indexData = IndexData.baseCreate(indexInformation, baseDate, marketPrice, closingPrice, highPrice, lowPrice, versus,
+                fluctuationRate, tradingQuantity, tradingPrice, marketTotalAmount);
 
         indexData.sourceType = SourceType.USER;
 
         return indexData;
     }
 
-    public IndexData updateByUser(
-            BigDecimal marketPrice,
-            BigDecimal closingPrice,
-            BigDecimal highPrice,
-            BigDecimal lowPrice,
-            BigDecimal versus,
-            BigDecimal fluctuationRate,
-            Long tradingQuantity,
-            Long tradingPrice,
-            Long marketTotalAmount) {
-        this.baseUpdate(
-                marketPrice,
-                closingPrice,
-                highPrice,
-                lowPrice,
-                versus,
-                fluctuationRate,
-                tradingQuantity,
-                tradingPrice,
-                marketTotalAmount);
+    public IndexData updateByUser(BigDecimal marketPrice, BigDecimal closingPrice, BigDecimal highPrice, BigDecimal lowPrice, BigDecimal versus,
+            BigDecimal fluctuationRate, Long tradingQuantity, Long tradingPrice, Long marketTotalAmount) {
+        this.baseUpdate(marketPrice, closingPrice, highPrice, lowPrice, versus, fluctuationRate, tradingQuantity, tradingPrice, marketTotalAmount);
         this.sourceType = SourceType.USER;
         return this;
     }
 
-    public IndexData updateByIntegration(
-            BigDecimal marketPrice,
-            BigDecimal closingPrice,
-            BigDecimal highPrice,
-            BigDecimal lowPrice,
-            BigDecimal versus,
-            BigDecimal fluctuationRate,
-            Long tradingQuantity,
-            Long tradingPrice,
-            Long marketTotalAmount) {
+    public IndexData updateByIntegration(BigDecimal marketPrice, BigDecimal closingPrice, BigDecimal highPrice, BigDecimal lowPrice,
+            BigDecimal versus, BigDecimal fluctuationRate, Long tradingQuantity, Long tradingPrice, Long marketTotalAmount) {
 
-        this.baseUpdate(
-                marketPrice,
-                closingPrice,
-                highPrice,
-                lowPrice,
-                versus,
-                fluctuationRate,
-                tradingQuantity,
-                tradingPrice,
-                marketTotalAmount);
+        this.baseUpdate(marketPrice, closingPrice, highPrice, lowPrice, versus, fluctuationRate, tradingQuantity, tradingPrice, marketTotalAmount);
         this.sourceType = SourceType.OPEN_API;
         return this;
     }
 
-    private void baseUpdate(
-            BigDecimal marketPrice,
-            BigDecimal closingPrice,
-            BigDecimal highPrice,
-            BigDecimal lowPrice,
-            BigDecimal versus,
-            BigDecimal fluctuationRate,
-            Long tradingQuantity,
-            Long tradingPrice,
-            Long marketTotalAmount) {
+    private void baseUpdate(BigDecimal marketPrice, BigDecimal closingPrice, BigDecimal highPrice, BigDecimal lowPrice, BigDecimal versus,
+            BigDecimal fluctuationRate, Long tradingQuantity, Long tradingPrice, Long marketTotalAmount) {
         this.marketPrice = marketPrice;
         this.closingPrice = closingPrice;
         this.highPrice = highPrice;

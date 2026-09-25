@@ -13,11 +13,12 @@ import jakarta.persistence.Id;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
-import java.time.LocalDate;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
+
+import java.time.LocalDate;
 
 @Entity
 @Getter
@@ -55,13 +56,8 @@ public class IndexInformation {
     @OneToOne(mappedBy = "indexInformation", cascade = CascadeType.ALL, orphanRemoval = true)
     private IntegrationConfig integrationConfig;
 
-    public static IndexInformation createByUser(
-            String indexClassification,
-            String indexName,
-            Integer employedItemsCount,
-            LocalDate basePointInTime,
-            Float baseIndex,
-            Boolean favorite) {
+    public static IndexInformation createByUser(String indexClassification, String indexName, Integer employedItemsCount, LocalDate basePointInTime,
+            Float baseIndex, Boolean favorite) {
         IndexInformation indexInformation = new IndexInformation();
         indexInformation.indexClassification = indexClassification;
         indexInformation.indexName = indexName;
@@ -76,12 +72,8 @@ public class IndexInformation {
         return indexInformation;
     }
 
-    public static IndexInformation createByIntegration(
-            String indexClassification,
-            String indexName,
-            Integer employedItemsCount,
-            LocalDate basePointInTime,
-            Float baseIndex) {
+    public static IndexInformation createByIntegration(String indexClassification, String indexName, Integer employedItemsCount,
+            LocalDate basePointInTime, Float baseIndex) {
         IndexInformation indexInformation = new IndexInformation();
         indexInformation.indexClassification = indexClassification;
         indexInformation.indexName = indexName;
@@ -96,11 +88,7 @@ public class IndexInformation {
         return indexInformation;
     }
 
-    public IndexInformation updateByUser(
-            Integer employedItemsCount,
-            LocalDate basePointInTime,
-            Float baseIndex,
-            Boolean favorite) {
+    public IndexInformation updateByUser(Integer employedItemsCount, LocalDate basePointInTime, Float baseIndex, Boolean favorite) {
         boolean isIndexInfoChanged = false;
         if (!this.employedItemsCount.equals(employedItemsCount)) {
             this.employedItemsCount = employedItemsCount;
@@ -126,8 +114,7 @@ public class IndexInformation {
         return this;
     }
 
-    public IndexInformation updateByIntegration(
-            Integer employedItemsCount, LocalDate basePointInTime, Float baseIndex) {
+    public IndexInformation updateByIntegration(Integer employedItemsCount, LocalDate basePointInTime, Float baseIndex) {
         this.employedItemsCount = employedItemsCount;
         this.basePointInTime = basePointInTime;
         this.baseIndex = baseIndex;

@@ -15,8 +15,7 @@ import java.util.List;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
-public class IntegrationHistoryRepositorySupportImpl
-        implements IntegrationHistoryRepositorySupport {
+public class IntegrationHistoryRepositorySupportImpl implements IntegrationHistoryRepositorySupport {
 
     private final JPAQueryFactory jpaQueryFactory;
 
@@ -24,23 +23,15 @@ public class IntegrationHistoryRepositorySupportImpl
     public List<IntegrationHistory> findSyncJobs(IntegrationHistorySearchCondition condition) {
         QIntegrationHistory integrationHistory = QIntegrationHistory.integrationHistory;
 
-        return jpaQueryFactory
-                .selectFrom(integrationHistory)
-                .where(this.filterConditions(condition), this.cursorCondition(condition))
-                .orderBy(this.orderSpecifiers(condition))
-                .limit(condition.size() + 1)
-                .fetch();
+        return jpaQueryFactory.selectFrom(integrationHistory).where(this.filterConditions(condition), this.cursorCondition(condition))
+                .orderBy(this.orderSpecifiers(condition)).limit(condition.size() + 1).fetch();
     }
 
     @Override
     public Long count(IntegrationHistorySearchCondition condition) {
         QIntegrationHistory integrationHistory = QIntegrationHistory.integrationHistory;
 
-        return jpaQueryFactory
-                .select(integrationHistory.count())
-                .from(integrationHistory)
-                .where(this.filterConditions(condition))
-                .fetchOne();
+        return jpaQueryFactory.select(integrationHistory.count()).from(integrationHistory).where(this.filterConditions(condition)).fetchOne();
     }
 
     // 조건절1.
@@ -53,12 +44,7 @@ public class IntegrationHistoryRepositorySupportImpl
         }
 
         if (condition.indexInfoId() != null) {
-            builder.and(
-                    integrationHistory
-                            .indexInformation
-                            .id
-                            .stringValue()
-                            .contains(String.valueOf(condition.indexInfoId())));
+            builder.and(integrationHistory.indexInformation.id.stringValue().contains(String.valueOf(condition.indexInfoId())));
         }
 
         if (condition.baseDateFrom() != null) {
@@ -99,75 +85,30 @@ public class IntegrationHistoryRepositorySupportImpl
 
         return switch (condition.sortField()) {
             case "targetDate" -> {
-                LocalDateTime localDateTime =
-                        LocalDateTime.parse(
-                                condition.cursor(),
-                                DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS"));
+                LocalDateTime localDateTime = LocalDateTime.parse(condition.cursor(), DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS"));
                 LocalDate localDate = localDateTime.toLocalDate();
                 yield isDesc
-                        ? integrationHistory
-                                .targetDate
-                                .lt(localDate)
-                                .or(
-                                        integrationHistory
-                                                .targetDate
-                                                .eq(localDate)
-                                                .and(integrationHistory.id.lt(condition.idAfter())))
-                        : integrationHistory
-                                .targetDate
-                                .gt(localDate)
-                                .or(
-                                        integrationHistory
-                                                .targetDate
-                                                .eq(localDate)
-                                                .and(
-                                                        integrationHistory.id.gt(
-                                                                condition.idAfter())));
+                        ? integrationHistory.targetDate.lt(localDate)
+                                .or(integrationHistory.targetDate.eq(localDate).and(integrationHistory.id.lt(condition.idAfter())))
+                        : integrationHistory.targetDate.gt(localDate)
+                                .or(integrationHistory.targetDate.eq(localDate).and(integrationHistory.id.gt(condition.idAfter())));
             }
-            case "jobTime" ->
-                    isDesc
-                            ? integrationHistory
-                                    .jobTime
-                                    .stringValue()
-                                    .lt(condition.cursor())
-                                    .or(
-                                            integrationHistory
-                                                    .jobType
-                                                    .stringValue()
-                                                    .eq(condition.cursor())
-                                                    .and(
-                                                            integrationHistory.id.lt(
-                                                                    condition.idAfter())))
-                            : integrationHistory
-                                    .jobTime
-                                    .stringValue()
-                                    .gt(condition.cursor())
-                                    .or(
-                                            integrationHistory
-                                                    .jobType
-                                                    .stringValue()
-                                                    .eq(condition.cursor())
-                                                    .and(
-                                                            integrationHistory.id.gt(
-                                                                    condition.idAfter())));
-            default ->
-                    isDesc
-                            ? integrationHistory.id.lt(condition.idAfter())
-                            : integrationHistory.id.gt(condition.idAfter());
+            case "jobTime" -> isDesc
+                    ? integrationHistory.jobTime.stringValue().lt(condition.cursor())
+                            .or(integrationHistory.jobType.stringValue().eq(condition.cursor()).and(integrationHistory.id.lt(condition.idAfter())))
+                    : integrationHistory.jobTime.stringValue().gt(condition.cursor())
+                            .or(integrationHistory.jobType.stringValue().eq(condition.cursor()).and(integrationHistory.id.gt(condition.idAfter())));
+            default -> isDesc ? integrationHistory.id.lt(condition.idAfter()) : integrationHistory.id.gt(condition.idAfter());
         };
     }
 
     // 정렬
     private OrderSpecifier<?>[] orderSpecifiers(IntegrationHistorySearchCondition condition) {
         ComparableExpressionBase<?> target = getSortTarget(condition.sortField());
-        Order direction =
-                "DESC".equalsIgnoreCase(condition.sortDirection()) ? Order.DESC : Order.ASC;
+        Order direction = "DESC".equalsIgnoreCase(condition.sortDirection()) ? Order.DESC : Order.ASC;
         QIntegrationHistory integrationHistory = QIntegrationHistory.integrationHistory;
 
-        return new OrderSpecifier<?>[] {
-            new OrderSpecifier<>(direction, target),
-            new OrderSpecifier<>(direction, integrationHistory.id)
-        };
+        return new OrderSpecifier<?>[] {new OrderSpecifier<>(direction, target), new OrderSpecifier<>(direction, integrationHistory.id)};
     }
 
     // 정렬 타겟 필드 가져오기

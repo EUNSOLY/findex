@@ -14,8 +14,7 @@ public class IntegrationHistoryServiceImpl implements IntegrationHistoryService 
     private final IntegrationHistoryRepository integrationHistoryRepository;
 
     @Override
-    public IntegrationHistoryCursorResult findSyncJobHistories(
-            IntegrationHistorySearchCondition condition) {
+    public IntegrationHistoryCursorResult findSyncJobHistories(IntegrationHistorySearchCondition condition) {
 
         List<IntegrationHistory> histories = integrationHistoryRepository.findSyncJobs(condition);
         Long totalElements = integrationHistoryRepository.count(condition);
@@ -24,8 +23,7 @@ public class IntegrationHistoryServiceImpl implements IntegrationHistoryService 
         String nextCursor = null;
         boolean hashNext = histories.size() > condition.size();
 
-        List<IntegrationHistory> resultHistories =
-                histories.subList(0, Math.min(histories.size(), condition.size()));
+        List<IntegrationHistory> resultHistories = histories.subList(0, Math.min(histories.size(), condition.size()));
 
         if (!histories.isEmpty()) {
             IntegrationHistory lastEntity = resultHistories.getLast();
@@ -33,9 +31,7 @@ public class IntegrationHistoryServiceImpl implements IntegrationHistoryService 
             nextCursor = this.getLastSortValue(condition.sortField(), lastEntity);
         }
 
-        CursorPaginationResult cursorPaginationResult =
-                CursorPaginationResult.of(
-                        nextCursor, nextIdAfter, condition.size(), totalElements, hashNext);
+        CursorPaginationResult cursorPaginationResult = CursorPaginationResult.of(nextCursor, nextIdAfter, condition.size(), totalElements, hashNext);
 
         return new IntegrationHistoryCursorResult(resultHistories, cursorPaginationResult);
     }

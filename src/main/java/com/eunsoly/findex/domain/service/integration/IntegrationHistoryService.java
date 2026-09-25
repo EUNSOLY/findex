@@ -5,8 +5,7 @@ import com.eunsoly.findex.repository.integration.IntegrationHistorySearchConditi
 
 public interface IntegrationHistoryService {
 
-    IntegrationHistoryCursorResult findSyncJobHistories(
-            IntegrationHistorySearchCondition condition);
+    IntegrationHistoryCursorResult findSyncJobHistories(IntegrationHistorySearchCondition condition);
 
     IntegrationHistory saveSuccess(IntegrationHistory entity);
 
