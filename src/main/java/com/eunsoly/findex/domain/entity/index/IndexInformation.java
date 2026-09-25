@@ -5,6 +5,8 @@ import com.eunsoly.findex.domain.entity.integration.IntegrationConfig;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -19,7 +21,7 @@ import lombok.ToString;
 
 @Entity
 @Getter
-@ToString
+@ToString(exclude = "integrationConfig")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(uniqueConstraints = @UniqueConstraint(columnNames = {"index_classification", "index_name"}))
 public class IndexInformation {
@@ -44,6 +46,7 @@ public class IndexInformation {
     private Float baseIndex; // 기준지수
 
     @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
     private SourceType sourceType;
 
     @Column(nullable = false)
@@ -98,14 +101,26 @@ public class IndexInformation {
             LocalDate basePointInTime,
             Float baseIndex,
             Boolean favorite) {
-
-        this.employedItemsCount = employedItemsCount;
-        this.basePointInTime = basePointInTime;
-        this.baseIndex = baseIndex;
-        this.sourceType = SourceType.USER;
+        boolean isIndexInfoChanged = false;
+        if (!this.employedItemsCount.equals(employedItemsCount)) {
+            this.employedItemsCount = employedItemsCount;
+            isIndexInfoChanged = true;
+        }
+        if (!this.basePointInTime.equals(basePointInTime)) {
+            this.basePointInTime = basePointInTime;
+            isIndexInfoChanged = true;
+        }
+        if (!this.baseIndex.equals(baseIndex)) {
+            this.baseIndex = baseIndex;
+            isIndexInfoChanged = true;
+        }
 
         if (favorite != null) {
             this.favorite = favorite;
+        }
+
+        if (isIndexInfoChanged) {
+            this.sourceType = SourceType.USER;
         }
 
         return this;

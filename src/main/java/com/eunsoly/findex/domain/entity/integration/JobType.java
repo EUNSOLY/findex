@@ -13,4 +13,14 @@ public enum JobType {
     INDEX_INFO("INDEX_INFO");
 
     String value;
+
+    public static JobType of(String type) {
+
+        for (JobType jobType : JobType.values()) {
+            if (jobType.getValue().equals(type)) {
+                return jobType;
+            }
+        }
+        throw new RuntimeException("");
+    }
 }
