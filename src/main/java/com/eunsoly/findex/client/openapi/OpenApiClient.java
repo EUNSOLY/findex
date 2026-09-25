@@ -17,10 +17,15 @@ public class OpenApiClient {
 
     private final String apiKey;
     private final RestClient restClient;
+    private final String apiRowCount;
 
-    public OpenApiClient(@Value("${findex.openapi.key}") String apiKey, RestClient restClient) {
+    public OpenApiClient(
+            @Value("${findex.openapi.key}") String apiKey,
+            @Value("${findex.openapi.rowcount}") String rowCount,
+            RestClient restClient) {
         this.apiKey = apiKey;
         this.restClient = restClient;
+        this.apiRowCount = rowCount;
     }
 
     private String getLastDate() {
@@ -38,7 +43,7 @@ public class OpenApiClient {
                                                 .queryParam("serviceKey", apiKey)
                                                 .queryParam("resultType", "json")
                                                 .queryParam("pageNo", 1)
-                                                .queryParam("numOfRows", 10000)
+                                                .queryParam("numOfRows", apiRowCount)
                                                 .queryParam("beginBasDt", begin)
                                                 .queryParam("endBasDt", today)
                                                 .build())
@@ -74,8 +79,31 @@ public class OpenApiClient {
                                         .queryParam("serviceKey", apiKey)
                                         .queryParam("resultType", "json")
                                         .queryParam("pageNo", pageNo)
-                                        .queryParam("numOfRows", 10000)
+                                        .queryParam("numOfRows", apiRowCount)
                                         .queryParam("basDt", baseDate)
+                                        .build())
+                .retrieve()
+                .body(OpenApiResponse.class);
+    }
+
+    public OpenApiResponse getIndexDataFromOpenApi(
+            int pageNo, String indexName, String baseDateFrom, String baseDateTo) {
+        String resultDateTo =
+                LocalDate.parse(baseDateTo)
+                        .plusDays(1)
+                        .format(DateTimeFormatter.ofPattern("yyyyMMdd"));
+        return restClient
+                .get()
+                .uri(
+                        uriBuilder ->
+                                uriBuilder
+                                        .queryParam("serviceKey", apiKey)
+                                        .queryParam("resultType", "json")
+                                        .queryParam("pageNo", pageNo)
+                                        .queryParam("numOfRows", apiRowCount)
+                                        .queryParam("idxNm", indexName)
+                                        .queryParam("beginBasDt", baseDateFrom)
+                                        .queryParam("endBasDt", resultDateTo)
                                         .build())
                 .retrieve()
                 .body(OpenApiResponse.class);

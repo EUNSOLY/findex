@@ -32,3 +32,4 @@ logging:
 findex:
   openapi:
     key: ${OPEN_API_KEY}
+    row-count: 10000

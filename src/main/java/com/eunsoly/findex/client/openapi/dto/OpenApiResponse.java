@@ -102,10 +102,10 @@ public class OpenApiResponse {
         private Long tradingQuantity; // 거래량
 
         @JsonProperty("trPrc")
-        private BigDecimal tradingPrice; // 거래대금
+        private Long tradingPrice; // 거래대금
 
         @JsonProperty("lstgMrktTotAmt")
-        private BigDecimal marketTotalAmount; // 상장시가총액
+        private Long marketTotalAmount; // 상장시가총액
 
         // 아래 내용은 실제 미사용(제거예정)
         @JsonProperty("lsYrEdVsFltRt")

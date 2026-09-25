@@ -1,7 +1,9 @@
 package com.eunsoly.findex.client.openapi;
 
+import com.eunsoly.findex.application.index.dto.CreateIndexDataCommand;
 import com.eunsoly.findex.application.index.dto.CreateIndexInformationCommand;
-import com.eunsoly.findex.application.integration.port.IndexInformationProvider;
+import com.eunsoly.findex.application.index.port.ExternalIndexProvider;
+import com.eunsoly.findex.application.integration.dto.IndexDataPage;
 import com.eunsoly.findex.client.openapi.dto.OpenApiResponse;
 import java.util.ArrayList;
 import java.util.List;
@@ -10,7 +12,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
-public class OpenApiClientService implements IndexInformationProvider {
+public class OpenApiClientService implements ExternalIndexProvider {
     private final OpenApiClient openApiClient;
 
     @Override
@@ -49,5 +51,41 @@ public class OpenApiClientService implements IndexInformationProvider {
         } while (hasNext);
 
         return result;
+    }
+
+    @Override
+    public IndexDataPage getOpenApiIndexData(
+            int pageNo,
+            String indexClassification,
+            String indexName,
+            String baseDateFrom,
+            String baseDateTo) {
+        OpenApiResponse res =
+                openApiClient.getIndexDataFromOpenApi(pageNo, indexName, baseDateFrom, baseDateTo);
+        int totalCount = res.getTotalCount();
+        long numOfRows = res.getResponse().getBody().getNumOfRows();
+        boolean hasNext = pageNo * numOfRows < totalCount;
+
+        OpenApiResponse.Items items = res.getItems();
+        List<CreateIndexDataCommand> commands =
+                items.getItems().stream()
+                        .filter(item -> item.getIndexClassification().equals(indexClassification))
+                        .map(
+                                item ->
+                                        CreateIndexDataCommand.of(
+                                                null,
+                                                item.getBaseDate(),
+                                                item.getMarketPrice(),
+                                                item.getClosingPrice(),
+                                                item.getHighPrice(),
+                                                item.getLowPrice(),
+                                                item.getVersus(),
+                                                item.getFluctuationRage(),
+                                                item.getTradingQuantity(),
+                                                item.getTradingPrice(),
+                                                item.getMarketTotalAmount()))
+                        .toList();
+
+        return IndexDataPage.of(commands, hasNext);
     }
 }
