@@ -8,6 +8,7 @@ import com.eunsoly.findex.controller.index.dto.CreateIndexInformationRequest;
 import com.eunsoly.findex.controller.index.dto.IndexInformationResponse;
 import com.eunsoly.findex.controller.index.dto.UpdateIndexInformationRequest;
 import lombok.RequiredArgsConstructor;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -34,6 +35,12 @@ public class IndexInformationController {
 
         IndexInformationResult result = indexInformationApplication.updateIndexInformation(command);
 
+        return IndexInformationResponse.of(result);
+    }
+
+    @GetMapping(value = "/api/index-infos/{id}")
+    public IndexInformationResponse getIndexInformation(@PathVariable Long id) {
+        IndexInformationResult result = indexInformationApplication.getIndexInformation(id);
         return IndexInformationResponse.of(result);
     }
 }

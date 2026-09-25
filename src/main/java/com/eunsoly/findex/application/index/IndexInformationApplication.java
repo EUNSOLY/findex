@@ -32,4 +32,11 @@ public class IndexInformationApplication {
 
         return IndexInformationResult.of(updatedIndexInformation);
     }
+
+    public IndexInformationResult getIndexInformation(Long id) {
+        IndexInformation indexInformation = indexInformationService.findById(id);
+
+        return IndexInformationResult.of(indexInformation);
+
+    }
 }
