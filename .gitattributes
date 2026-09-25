@@ -1,3 +1,7 @@
+# 전체 LF (줄바꿈 개행처리 OS 동일하도록 명시적 작성)
+* text=auto eol=lf
+
+# 예외
 /gradlew text eol=lf
 *.bat text eol=crlf
 *.jar binary

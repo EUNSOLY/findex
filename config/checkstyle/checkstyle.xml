@@ -1,0 +1,524 @@
+<?xml version="1.0"?>
+<!DOCTYPE module PUBLIC
+        "-//Checkstyle//DTD Checkstyle Configuration 1.3//EN"
+        "https://checkstyle.org/dtds/configuration_1_3.dtd">
+
+<!--
+    Checkstyle configuration that checks the Google coding conventions from Google Java Style
+    that can be found at https://google.github.io/styleguide/javaguide.html
+
+    Checkstyle is very configurable. Be sure to read the documentation at
+    http://checkstyle.org (or in your downloaded distribution).
+
+    To completely disable a check, just comment it out or delete it from the file.
+    To suppress certain violations, please review suppression filters.
+
+    Authors: Max Vetrenko, Ruslan Diachenko, Roman Ivanov.
+ -->
+
+<!--
+    [이 파일은]
+    Checkstyle이 코드를 검사할 때 쓰는 "채점 기준표".
+    구글 자바 스타일 가이드를 바탕으로 한 공식 google_checks.xml을 프로젝트에 맞게 일부 수정한 버전.
+
+    [구조]
+    Checker        : 최상위. 파일 단위 검사 (탭 문자, 줄 길이 등)
+      └ TreeWalker : 자바 코드를 문법 구조(트리)로 분석해서 하는 검사 (들여쓰기, 네이밍, 괄호 등)
+
+    [규칙 끄는 법]
+    - 규칙 전체를 끄려면: 해당 <module>을 주석 처리하거나 삭제
+    - 코드 일부만 예외로 두려면: 맨 아래 억제(Suppression) 필터 참고
+-->
+
+<module name="Checker">
+    <!-- 코드에 @SuppressWarnings("checkstyle:규칙명")을 붙이면 그 규칙을 건너뛰게 해줌 -->
+    <module name="SuppressWarningsFilter"/>
+
+    <!-- 소스 파일 인코딩 -->
+    <property name="charset" value="UTF-8"/>
+
+    <!-- 위반 시 심각도: warning(경고)
+         build.gradle의 maxWarnings = 0 설정 때문에 경고가 하나라도 있으면 빌드 실패 -->
+    <property name="severity" value="warning"/>
+
+    <!-- 검사 대상 파일 확장자 -->
+    <property name="fileExtensions" value="java, properties, xml"/>
+
+    <!-- module-info.java 파일은 검사에서 제외 -->
+    <!-- See https://checkstyle.org/filefilters/index.html -->
+    <module name="BeforeExecutionExclusionFileFilter">
+        <property name="fileNamePattern" value="module\-info\.java$"/>
+    </module>
+
+    <!-- 별도 파일(checkstyle-suppressions.xml)로 특정 파일/규칙을 예외 처리할 수 있게 함
+         optional = true : 그 파일이 없어도 에러 안 남 -->
+    <!-- https://checkstyle.org/filters/suppressionfilter.html -->
+    <module name="SuppressionFilter">
+        <property name="file" value="${org.checkstyle.google.suppressionfilter.config}"
+                  default="checkstyle-suppressions.xml"/>
+        <property name="optional" value="true"/>
+    </module>
+
+    <!-- ============================================================ -->
+    <!-- 파일 단위 검사                                                  -->
+    <!-- ============================================================ -->
+
+    <!-- 탭 문자 사용 금지 (들여쓰기는 스페이스로)
+         eachLine = true : 탭이 있는 모든 줄을 각각 보고 (false면 파일당 1번만) -->
+    <module name="FileTabCharacter">
+        <property name="eachLine" value="true"/>
+    </module>
+
+    <!-- 한 줄 최대 길이: 120자 (자바 파일만)
+         package, import 줄과 URL이 들어간 줄은 길어도 봐줌 -->
+    <module name="LineLength">
+        <property name="fileExtensions" value="java"/>
+        <property name="max" value="120"/>
+        <property name="ignorePattern" value="^package.*|^import.*|a href|href|http://|https://|ftp://"/>
+    </module>
+
+    <!-- ============================================================ -->
+    <!-- 자바 코드 구조 검사 (TreeWalker 안의 규칙들)                     -->
+    <!-- ============================================================ -->
+    <module name="TreeWalker">
+
+        <!-- ========== 파일/클래스 구조 ========== -->
+
+        <!-- 파일 이름 = public 최상위 클래스 이름 (IndexService.java 안에는 IndexService 클래스) -->
+        <module name="OuterTypeFilename"/>
+
+        <!-- 문자열에 \u000a 같은 유니코드/8진수 이스케이프 대신 \n 같은 특수 이스케이프를 쓰라는 규칙 -->
+        <module name="IllegalTokenText">
+            <property name="tokens" value="STRING_LITERAL, CHAR_LITERAL"/>
+            <property name="format"
+                      value="\\u00(09|0(a|A)|0(c|C)|0(d|D)|22|27|5(C|c))|\\(0(10|11|12|14|15|42|47)|134)"/>
+            <property name="message"
+                      value="Consider using special escape sequence instead of octal value or Unicode escaped value."/>
+        </module>
+
+        <!-- 읽을 수 있는 문자를 \uXXXX로 쓰지 말라는 규칙
+             (제어 문자, 끝에 주석 달린 경우, 보이지 않는 문자는 허용) -->
+        <module name="AvoidEscapedUnicodeCharacters">
+            <property name="allowEscapesForControlCharacters" value="true"/>
+            <property name="allowByTailComment" value="true"/>
+            <property name="allowNonPrintableEscapes" value="true"/>
+        </module>
+
+        <!-- import java.util.*; 처럼 * import 금지 -->
+        <module name="AvoidStarImport"/>
+
+        <!-- 한 파일에 최상위 클래스는 하나만 -->
+        <module name="OneTopLevelClass"/>
+
+        <!-- package, import 문은 줄바꿈 금지 (길어도 한 줄로) -->
+        <module name="NoLineWrap">
+            <property name="tokens" value="PACKAGE_DEF, IMPORT, STATIC_IMPORT"/>
+        </module>
+
+        <!-- ========== 중괄호 { } ========== -->
+
+        <!-- try, finally, if, else, switch의 빈 블록 { } 금지
+             option = TEXT : 블록 안에 주석이라도 있으면 허용 -->
+        <module name="EmptyBlock">
+            <property name="option" value="TEXT"/>
+            <property name="tokens"
+                      value="LITERAL_TRY, LITERAL_FINALLY, LITERAL_IF, LITERAL_ELSE, LITERAL_SWITCH"/>
+        </module>
+
+        <!-- if, else, for, while, do는 한 줄짜리라도 중괄호 필수
+             예) if (x) return;   ← 위반
+                 if (x) { return; } ← 통과 -->
+        <module name="NeedBraces">
+            <property name="tokens"
+                      value="LITERAL_DO, LITERAL_ELSE, LITERAL_FOR, LITERAL_IF, LITERAL_WHILE"/>
+        </module>
+
+        <!-- 여는 중괄호 { 는 같은 줄 끝에 (다음 줄에 단독으로 두지 않음)
+             예) public void run() {   ← 통과 -->
+        <module name="LeftCurly">
+            <property name="tokens"
+                      value="ANNOTATION_DEF, CLASS_DEF, CTOR_DEF, ENUM_CONSTANT_DEF, ENUM_DEF,
+                    INTERFACE_DEF, LAMBDA, LITERAL_CASE, LITERAL_CATCH, LITERAL_DEFAULT,
+                    LITERAL_DO, LITERAL_ELSE, LITERAL_FINALLY, LITERAL_FOR, LITERAL_IF,
+                    LITERAL_SWITCH, LITERAL_SYNCHRONIZED, LITERAL_TRY, LITERAL_WHILE, METHOD_DEF,
+                    OBJBLOCK, STATIC_INIT, RECORD_DEF, COMPACT_CTOR_DEF"/>
+        </module>
+
+        <!-- 닫는 중괄호 } 규칙 (1): try/catch, if/else 등은 } 뒤에 이어서 씀
+             예) } else {   ← 통과 -->
+        <module name="RightCurly">
+            <property name="id" value="RightCurlySame"/>
+            <property name="tokens"
+                      value="LITERAL_TRY, LITERAL_CATCH, LITERAL_FINALLY, LITERAL_IF, LITERAL_ELSE,
+                    LITERAL_DO"/>
+        </module>
+
+        <!-- 닫는 중괄호 } 규칙 (2): 클래스, 메서드, for, while 등의 } 는 한 줄에 단독으로 -->
+        <module name="RightCurly">
+            <property name="id" value="RightCurlyAlone"/>
+            <property name="option" value="alone"/>
+            <property name="tokens"
+                      value="CLASS_DEF, METHOD_DEF, CTOR_DEF, LITERAL_FOR, LITERAL_WHILE, STATIC_INIT,
+                    INSTANCE_INIT, ANNOTATION_DEF, ENUM_DEF, INTERFACE_DEF, RECORD_DEF,
+                    COMPACT_CTOR_DEF, LITERAL_SWITCH"/>
+        </module>
+
+        <!-- 위 RightCurlyAlone 규칙의 예외: 빈 블록 { } 이나 한 줄짜리 블록은 봐줌
+             (Checkstyle 버그 때문에 임시로 넣은 예외) -->
+        <module name="SuppressionXpathSingleFilter">
+            <!-- suppresion is required till https://github.com/checkstyle/checkstyle/issues/7541 -->
+            <property name="id" value="RightCurlyAlone"/>
+            <property name="query" value="//RCURLY[parent::SLIST[count(./*)=1]
+                                     or preceding-sibling::*[last()][self::LCURLY]]"/>
+        </module>
+
+        <!-- ========== 공백 ========== -->
+
+        <!-- 쉼표, 세미콜론, 형변환, if/for 등의 키워드 "뒤에" 공백 필수
+             예) foo(a,b)  ← 위반,  foo(a, b) ← 통과
+                 if(x)     ← 위반,  if (x)    ← 통과 -->
+        <module name="WhitespaceAfter">
+            <property name="tokens"
+                      value="COMMA, SEMI, TYPECAST, LITERAL_IF, LITERAL_ELSE, LITERAL_RETURN,
+                    LITERAL_WHILE, LITERAL_DO, LITERAL_FOR, LITERAL_FINALLY, DO_WHILE, ELLIPSIS,
+                    LITERAL_SWITCH, LITERAL_SYNCHRONIZED, LITERAL_TRY, LITERAL_CATCH, LAMBDA,
+                    LITERAL_YIELD, LITERAL_CASE"/>
+        </module>
+
+        <!-- 연산자(=, +, ==, && 등)와 키워드 "앞뒤" 모두 공백 필수
+             예) a=b+c ← 위반,  a = b + c ← 통과
+             빈 생성자/메서드/람다/클래스/반복문의 {} 는 붙여 써도 허용 -->
+        <module name="WhitespaceAround">
+            <property name="allowEmptyConstructors" value="true"/>
+            <property name="allowEmptyLambdas" value="true"/>
+            <property name="allowEmptyMethods" value="true"/>
+            <property name="allowEmptyTypes" value="true"/>
+            <property name="allowEmptyLoops" value="true"/>
+            <property name="ignoreEnhancedForColon" value="false"/>
+            <property name="tokens"
+                      value="ASSIGN, BAND, BAND_ASSIGN, BOR, BOR_ASSIGN, BSR, BSR_ASSIGN, BXOR,
+                    BXOR_ASSIGN, COLON, DIV, DIV_ASSIGN, DO_WHILE, EQUAL, GE, GT, LAMBDA, LAND,
+                    LCURLY, LE, LITERAL_CATCH, LITERAL_DO, LITERAL_ELSE, LITERAL_FINALLY,
+                    LITERAL_FOR, LITERAL_IF, LITERAL_RETURN, LITERAL_SWITCH, LITERAL_SYNCHRONIZED,
+                    LITERAL_TRY, LITERAL_WHILE, LOR, LT, MINUS, MINUS_ASSIGN, MOD, MOD_ASSIGN,
+                    NOT_EQUAL, PLUS, PLUS_ASSIGN, QUESTION, RCURLY, SL, SLIST, SL_ASSIGN, SR,
+                    SR_ASSIGN, STAR, STAR_ASSIGN, LITERAL_ASSERT, TYPE_EXTENSION_AND"/>
+            <!-- 위반 시 출력할 오류 문구 (여기 value를 바꾸면 문구 변경 가능) -->
+            <message key="ws.notFollowed"
+                     value="WhitespaceAround: ''{0}'' is not followed by whitespace. Empty blocks
+               may only be represented as '{}' when not part of a multi-block statement (4.1.3)"/>
+            <message key="ws.notPreceded"
+                     value="WhitespaceAround: ''{0}'' is not preceded with whitespace."/>
+        </module>
+
+        <!-- ========== 선언/문장 ========== -->
+
+        <!-- 한 줄에 문장 하나만  예) a = 1; b = 2; ← 위반 -->
+        <module name="OneStatementPerLine"/>
+
+        <!-- 변수는 한 줄에 하나씩 선언  예) int a, b; ← 위반 -->
+        <module name="MultipleVariableDeclarations"/>
+
+        <!-- 배열은 자바 스타일로  예) String args[] ← 위반,  String[] args ← 통과 -->
+        <module name="ArrayTypeStyle"/>
+
+        <!-- switch문에 default 필수 -->
+        <module name="MissingSwitchDefault"/>
+
+        <!-- switch의 case에서 break 없이 다음 case로 넘어가는 것 금지 (의도적이면 주석 필요) -->
+        <module name="FallThrough"/>
+
+        <!-- long 리터럴은 대문자 L  예) 100l ← 위반(숫자 1과 헷갈림),  100L ← 통과 -->
+        <module name="UpperEll"/>
+
+        <!-- 접근제어자 순서 규칙  예) static public ← 위반,  public static ← 통과 -->
+        <module name="ModifierOrder"/>
+
+        <!-- package, import, 클래스, 메서드, 필드 등 사이에 빈 줄 필수
+             allowNoEmptyLineBetweenFields = true : 필드끼리는 빈 줄 없이 붙여도 됨 -->
+        <module name="EmptyLineSeparator">
+            <property name="tokens"
+                      value="PACKAGE_DEF, IMPORT, STATIC_IMPORT, CLASS_DEF, INTERFACE_DEF, ENUM_DEF,
+                    STATIC_INIT, INSTANCE_INIT, METHOD_DEF, CTOR_DEF, VARIABLE_DEF, RECORD_DEF,
+                    COMPACT_CTOR_DEF"/>
+            <property name="allowNoEmptyLineBetweenFields" value="true"/>
+        </module>
+
+        <!-- ========== 줄바꿈 위치 ========== -->
+
+        <!-- 점(.)에서 줄바꿈할 때는 점을 "다음 줄 앞"에
+             예) list.stream()
+                     .map(...)   ← 통과 -->
+        <module name="SeparatorWrap">
+            <property name="id" value="SeparatorWrapDot"/>
+            <property name="tokens" value="DOT"/>
+            <property name="option" value="nl"/>
+        </module>
+
+        <!-- 쉼표(,)에서 줄바꿈할 때는 쉼표를 "줄 끝"에 -->
+        <module name="SeparatorWrap">
+            <property name="id" value="SeparatorWrapComma"/>
+            <property name="tokens" value="COMMA"/>
+            <property name="option" value="EOL"/>
+        </module>
+
+        <!-- 가변인자(...)에서 줄바꿈할 때는 줄 끝에 -->
+        <module name="SeparatorWrap">
+            <!-- ELLIPSIS is EOL until https://github.com/google/styleguide/issues/259 -->
+            <property name="id" value="SeparatorWrapEllipsis"/>
+            <property name="tokens" value="ELLIPSIS"/>
+            <property name="option" value="EOL"/>
+        </module>
+
+        <!-- 배열 선언 [] 에서 줄바꿈할 때는 줄 끝에 -->
+        <module name="SeparatorWrap">
+            <!-- ARRAY_DECLARATOR is EOL until https://github.com/google/styleguide/issues/258 -->
+            <property name="id" value="SeparatorWrapArrayDeclarator"/>
+            <property name="tokens" value="ARRAY_DECLARATOR"/>
+            <property name="option" value="EOL"/>
+        </module>
+
+        <!-- 메서드 참조(::)에서 줄바꿈할 때는 다음 줄 앞에 -->
+        <module name="SeparatorWrap">
+            <property name="id" value="SeparatorWrapMethodRef"/>
+            <property name="tokens" value="METHOD_REF"/>
+            <property name="option" value="nl"/>
+        </module>
+
+        <!-- ========== 네이밍 규칙 ========== -->
+        <!-- format = 정규식. 이름이 이 패턴과 안 맞으면 위반 -->
+
+        <!-- 패키지명: 전부 소문자  예) com.eunsoly.findex -->
+        <module name="PackageName">
+            <property name="format" value="^[a-z]+(\.[a-z][a-z0-9]*)*$"/>
+            <message key="name.invalidPattern"
+                     value="Package name ''{0}'' must match pattern ''{1}''."/>
+        </module>
+
+        <!-- 클래스/인터페이스/enum/record명: 대문자로 시작 (기본 패턴 사용)  예) IndexService -->
+        <module name="TypeName">
+            <property name="tokens" value="CLASS_DEF, INTERFACE_DEF, ENUM_DEF,
+                    ANNOTATION_DEF, RECORD_DEF"/>
+            <message key="name.invalidPattern"
+                     value="Type name ''{0}'' must match pattern ''{1}''."/>
+        </module>
+
+        <!-- 메서드 파라미터명: 소문자로 시작하는 카멜케이스 (한 글자도 허용) -->
+        <module name="ParameterName">
+            <property name="format" value="^[a-z]([a-z0-9][a-zA-Z0-9]*)?$"/>
+            <message key="name.invalidPattern"
+                     value="Parameter name ''{0}'' must match pattern ''{1}''."/>
+        </module>
+
+        <!-- 람다 파라미터명: 위와 동일  예) list.forEach(item -> ...) -->
+        <module name="LambdaParameterName">
+            <property name="format" value="^[a-z]([a-z0-9][a-zA-Z0-9]*)?$"/>
+            <message key="name.invalidPattern"
+                     value="Lambda parameter name ''{0}'' must match pattern ''{1}''."/>
+        </module>
+
+        <!-- catch 파라미터명  예) catch (Exception e) -->
+        <module name="CatchParameterName">
+            <property name="format" value="^[a-z]([a-z0-9][a-zA-Z0-9]*)?$"/>
+            <message key="name.invalidPattern"
+                     value="Catch parameter name ''{0}'' must match pattern ''{1}''."/>
+        </module>
+
+        <!-- 지역 변수명 -->
+        <module name="LocalVariableName">
+            <property name="format" value="^[a-z]([a-z0-9][a-zA-Z0-9]*)?$"/>
+            <message key="name.invalidPattern"
+                     value="Local variable name ''{0}'' must match pattern ''{1}''."/>
+        </module>
+
+        <!-- 패턴 매칭 변수명  예) if (obj instanceof String str) -->
+        <module name="PatternVariableName">
+            <property name="format" value="^[a-z]([a-z0-9][a-zA-Z0-9]*)?$"/>
+            <message key="name.invalidPattern"
+                     value="Pattern variable name ''{0}'' must match pattern ''{1}''."/>
+        </module>
+
+        <!-- 클래스 제네릭 타입명: 대문자 한 글자(+숫자) 또는 T로 끝나는 이름  예) <T>, <E2>, <RequestT> -->
+        <module name="ClassTypeParameterName">
+            <property name="format" value="(^[A-Z][0-9]?)$|([A-Z][a-zA-Z0-9]*[T]$)"/>
+            <message key="name.invalidPattern"
+                     value="Class type name ''{0}'' must match pattern ''{1}''."/>
+        </module>
+
+        <!-- record 컴포넌트명  예) record IndexDto(String indexName) -->
+        <module name="RecordComponentName">
+            <property name="format" value="^[a-z]([a-z0-9][a-zA-Z0-9]*)?$"/>
+            <message key="name.invalidPattern"
+                     value="Record component name ''{0}'' must match pattern ''{1}''."/>
+        </module>
+
+        <!-- record 제네릭 타입명 (클래스와 같은 규칙) -->
+        <module name="RecordTypeParameterName">
+            <property name="format" value="(^[A-Z][0-9]?)$|([A-Z][a-zA-Z0-9]*[T]$)"/>
+            <message key="name.invalidPattern"
+                     value="Record type name ''{0}'' must match pattern ''{1}''."/>
+        </module>
+
+        <!-- 메서드 제네릭 타입명 -->
+        <module name="MethodTypeParameterName">
+            <property name="format" value="(^[A-Z][0-9]?)$|([A-Z][a-zA-Z0-9]*[T]$)"/>
+            <message key="name.invalidPattern"
+                     value="Method type name ''{0}'' must match pattern ''{1}''."/>
+        </module>
+
+        <!-- 인터페이스 제네릭 타입명 -->
+        <module name="InterfaceTypeParameterName">
+            <property name="format" value="(^[A-Z][0-9]?)$|([A-Z][a-zA-Z0-9]*[T]$)"/>
+            <message key="name.invalidPattern"
+                     value="Interface type name ''{0}'' must match pattern ''{1}''."/>
+        </module>
+
+        <!-- finalize() 메서드 사용 금지 (자바에서 사용 중단 예정인 기능) -->
+        <module name="NoFinalizer"/>
+
+        <!-- 제네릭 꺾쇠 < > 주변 공백 규칙  예) List< String > ← 위반,  List<String> ← 통과 -->
+        <module name="GenericWhitespace">
+            <message key="ws.followed"
+                     value="GenericWhitespace ''{0}'' is followed by whitespace."/>
+            <message key="ws.preceded"
+                     value="GenericWhitespace ''{0}'' is preceded with whitespace."/>
+            <message key="ws.illegalFollow"
+                     value="GenericWhitespace ''{0}'' should followed by whitespace."/>
+            <message key="ws.notPreceded"
+                     value="GenericWhitespace ''{0}'' is not preceded with whitespace."/>
+        </module>
+
+        <!-- ========== 들여쓰기 ========== -->
+        <!-- ⚠️ 주의: 여기는 4칸 기준인데, Spotless의 googleJavaFormat()은 2칸으로 정렬함
+             → 둘이 충돌해서 Spotless가 정렬한 코드가 전부 위반으로 걸림
+             → build.gradle에서 googleJavaFormat().aosp() 로 바꾸면 4칸/줄바꿈 8칸으로 맞춰짐 -->
+        <module name="Indentation">
+            <property name="basicOffset" value="4"/>           <!-- 기본 들여쓰기 칸 수 -->
+            <property name="braceAdjustment" value="0"/>       <!-- 중괄호 추가 들여쓰기 -->
+            <property name="caseIndent" value="4"/>            <!-- switch 안 case 들여쓰기 -->
+            <property name="throwsIndent" value="8"/>          <!-- 줄바꿈된 throws 들여쓰기 -->
+            <property name="lineWrappingIndentation" value="8"/> <!-- 긴 줄을 줄바꿈했을 때 이어지는 줄 들여쓰기 -->
+            <property name="arrayInitIndent" value="4"/>       <!-- 배열 초기화 { } 안 들여쓰기 -->
+        </module>
+
+        <!-- case/default 뒤 콜론(:) 앞에 공백 금지  예) case 1 : ← 위반,  case 1: ← 통과 -->
+        <module name="NoWhitespaceBeforeCaseDefaultColon"/>
+
+        <!-- 같은 이름의 오버로딩 메서드는 붙어 있어야 함 (중간에 다른 메서드 끼우기 금지) -->
+        <module name="OverloadMethodsDeclarationOrder"/>
+
+        <!-- 변수 선언과 첫 사용 위치가 너무 멀면 위반 (쓰기 직전에 선언하라는 규칙) -->
+        <module name="VariableDeclarationUsageDistance"/>
+
+        <!-- ========== 괄호/연산자 주변 공백 ========== -->
+        <!-- 메서드 이름과 여는 괄호 사이 공백 금지  예) run () ← 위반,  run() ← 통과 -->
+        <module name="MethodParamPad">
+            <property name="tokens"
+                      value="CTOR_DEF, LITERAL_NEW, METHOD_CALL, METHOD_DEF,
+                    SUPER_CTOR_CALL, ENUM_CONSTANT_DEF, RECORD_DEF"/>
+        </module>
+
+        <!-- 쉼표, 세미콜론, 증감 연산자(i++ 등), 점 "앞"에 공백 금지  예) foo(a , b) ← 위반
+             allowLineBreaks = true : 줄바꿈은 허용 (체이닝할 때 .map() 을 다음 줄로) -->
+        <module name="NoWhitespaceBefore">
+            <property name="tokens"
+                      value="COMMA, SEMI, POST_INC, POST_DEC, DOT,
+                    LABELED_STAT, METHOD_REF"/>
+            <property name="allowLineBreaks" value="true"/>
+        </module>
+
+        <!-- 괄호 안쪽 공백 금지  예) run( a ) ← 위반,  run(a) ← 통과 -->
+        <module name="ParenPad">
+            <property name="tokens"
+                      value="ANNOTATION, ANNOTATION_FIELD_DEF, CTOR_CALL, CTOR_DEF, DOT, ENUM_CONSTANT_DEF,
+                    EXPR, LITERAL_CATCH, LITERAL_DO, LITERAL_FOR, LITERAL_IF, LITERAL_NEW,
+                    LITERAL_SWITCH, LITERAL_SYNCHRONIZED, LITERAL_WHILE, METHOD_CALL,
+                    METHOD_DEF, QUESTION, RESOURCE_SPECIFICATION, SUPER_CTOR_CALL, LAMBDA,
+                    RECORD_DEF"/>
+        </module>
+
+        <!-- 연산자에서 줄바꿈할 때는 연산자를 "다음 줄 앞"에
+             예) a
+                   + b   ← 통과 -->
+        <module name="OperatorWrap">
+            <property name="option" value="NL"/>
+            <property name="tokens"
+                      value="BAND, BOR, BSR, BXOR, DIV, EQUAL, GE, GT, LAND, LE, LITERAL_INSTANCEOF, LOR,
+                    LT, MINUS, MOD, NOT_EQUAL, PLUS, QUESTION, SL, SR, STAR, METHOD_REF,
+                    TYPE_EXTENSION_AND "/>
+        </module>
+
+        <!-- ========== 애노테이션 위치 ========== -->
+
+        <!-- 클래스/메서드/생성자의 애노테이션은 각각 한 줄에 따로
+             예) @Service
+                 public class IndexService   ← 통과 -->
+        <module name="AnnotationLocation">
+            <property name="id" value="AnnotationLocationMostCases"/>
+            <property name="tokens"
+                      value="CLASS_DEF, INTERFACE_DEF, ENUM_DEF, METHOD_DEF, CTOR_DEF,
+                      RECORD_DEF, COMPACT_CTOR_DEF"/>
+        </module>
+
+        <!-- 필드의 애노테이션은 같은 줄에 여러 개 써도 허용  예) @Id @GeneratedValue private Long id; -->
+        <module name="AnnotationLocation">
+            <property name="id" value="AnnotationLocationVariables"/>
+            <property name="tokens" value="VARIABLE_DEF"/>
+            <property name="allowSamelineMultipleAnnotations" value="true"/>
+        </module>
+
+        <!-- Javadoc rules are intentionally relaxed for Spring application code. -->
+        <!-- (원본의 Javadoc 필수 규칙들은 이 프로젝트에서 제거함) -->
+
+        <!-- 메서드명: 소문자 2글자 이상으로 시작 (언더스코어 허용 → 테스트 메서드명 find_success 같은 것 가능) -->
+        <module name="MethodName">
+            <property name="format" value="^[a-z][a-z0-9]\w*$"/>
+            <message key="name.invalidPattern"
+                     value="Method name ''{0}'' must match pattern ''{1}''."/>
+        </module>
+
+        <!-- 빈 catch 블록 금지 (단, 예외 변수명이 expected면 허용 → 테스트에서 의도적으로 예외 무시할 때) -->
+        <module name="EmptyCatchBlock">
+            <property name="exceptionVariableName" value="expected"/>
+        </module>
+
+        <!-- 주석도 코드와 같은 들여쓰기 레벨에 맞춰야 함 -->
+        <module name="CommentsIndentation">
+            <property name="tokens" value="SINGLE_LINE_COMMENT, BLOCK_COMMENT_BEGIN"/>
+        </module>
+
+        <!-- ========== 예외 처리(억제) 필터 ========== -->
+
+        <!-- 별도 파일(checkstyle-xpath-suppressions.xml)로 코드 위치 단위 예외 처리 (파일 없어도 됨) -->
+        <!-- https://checkstyle.org/filters/suppressionxpathfilter.html -->
+        <module name="SuppressionXpathFilter">
+            <property name="file" value="${org.checkstyle.google.suppressionxpathfilter.config}"
+                      default="checkstyle-xpath-suppressions.xml"/>
+            <property name="optional" value="true"/>
+        </module>
+
+        <!-- 맨 위 SuppressWarningsFilter가 @SuppressWarnings를 읽을 수 있게 해주는 짝꿍 모듈 -->
+        <module name="SuppressWarningsHolder"/>
+
+        <!-- 주석으로 구간 단위 끄기/켜기
+             예) // CHECKSTYLE.OFF: LineLength
+                 ...이 구간은 줄 길이 검사 안 함...
+                 // CHECKSTYLE.ON: LineLength -->
+        <module name="SuppressionCommentFilter">
+            <property name="offCommentFormat" value="CHECKSTYLE.OFF\: ([\w\|]+)"/>
+            <property name="onCommentFormat" value="CHECKSTYLE.ON\: ([\w\|]+)"/>
+            <property name="checkFormat" value="$1"/>
+        </module>
+
+        <!-- 주석 바로 다음 한 줄만 끄기
+             예) // CHECKSTYLE.SUPPRESS: AbbreviationAsWordInName
+                 private String userURL; -->
+        <module name="SuppressWithNearbyCommentFilter">
+            <property name="commentFormat" value="CHECKSTYLE.SUPPRESS\: ([\w\|]+)"/>
+            <!-- $1 refers to the first match group in the regex defined in commentFormat -->
+            <property name="checkFormat" value="$1"/>
+            <!-- The check is suppressed in the next line of code after the comment -->
+            <property name="influenceFormat" value="1"/>
+        </module>
+    </module>
+</module>

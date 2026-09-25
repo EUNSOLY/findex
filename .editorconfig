@@ -1,0 +1,22 @@
+# 최상위 설정 파일임 (상위 폴더의 .editorconfig는 탐색하지 않음)
+root = true
+
+# 모든 .java 파일에 적용
+[*.java]
+
+# ── IntelliJ 전용 설정 ──
+# 아래 import 규칙은 IntelliJ만 .editorconfig에서 읽을 수 있음 (ij_ 접두사)
+# VS Code, Eclipse는 import 규칙을 .editorconfig에서 읽는 기능 자체가 없음
+#   → VS Code: .vscode/settings.json 에 별도 설정
+#   → Eclipse: .settings/org.eclipse.jdt.ui.prefs 에 별도 설정
+# IDE와 무관하게 강제하려면 Checkstyle(AvoidStarImport) 또는 Spotless 사용
+
+# 같은 패키지의 클래스 import가 N개 이상이면 와일드카드(*)로 합침
+# 기본값: 5 (예: java.util.List, Map, Set 등 5개 이상 → import java.util.*;)
+# 999: 사실상 합치지 않음 → 클래스별 단일 import 유지
+ij_java_class_count_to_use_import_on_demand = 999
+
+# static import에 동일 규칙 적용
+# 기본값: 3 (예: Assertions.assertThat, assertEquals 등 3개 이상 → Assertions.*;)
+# 999: 사실상 합치지 않음 → static import도 단일 import 유지
+ij_java_names_count_to_use_import_on_demand = 999
