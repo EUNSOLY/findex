@@ -1,6 +1,6 @@
 package com.eunsoly.findex.controller.integration.dto;
 
-import com.eunsoly.findex.application.integration.dto.SyncIndexInfoResult;
+import com.eunsoly.findex.application.integration.dto.SyncIndexResult;
 
 public record SyncIndexInfoResponse(
         Long id,
@@ -11,7 +11,7 @@ public record SyncIndexInfoResponse(
         String jobTime,
         String result) {
 
-    public static SyncIndexInfoResponse of(SyncIndexInfoResult syncIndexInfoResult) {
+    public static SyncIndexInfoResponse of(SyncIndexResult syncIndexInfoResult) {
         return new SyncIndexInfoResponse(
                 syncIndexInfoResult.id(),
                 syncIndexInfoResult.jobType(),

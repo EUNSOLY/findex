@@ -5,7 +5,7 @@ import com.eunsoly.findex.domain.entity.integration.IntegrationHistory;
 import java.time.format.DateTimeFormatter;
 import java.util.Optional;
 
-public record SyncIndexInfoResult(
+public record SyncIndexResult(
         Long id,
         String jobType,
         Long indexInfoId,
@@ -14,7 +14,7 @@ public record SyncIndexInfoResult(
         String jobTime,
         String result) {
 
-    public static SyncIndexInfoResult of(
+    public static SyncIndexResult of(
             IntegrationHistory integrationHistory, IndexInformation indexInformation) {
         Long indexInformationId =
                 Optional.ofNullable(indexInformation).map(IndexInformation::getId).orElse(null);
@@ -33,7 +33,7 @@ public record SyncIndexInfoResult(
                                                         "yyyy-MM-dd'T'HH:mm:ss")))
                         .orElse(null);
 
-        return new SyncIndexInfoResult(
+        return new SyncIndexResult(
                 integrationHistory.getId(),
                 integrationHistory.getJobType().getValue(),
                 indexInformationId,
