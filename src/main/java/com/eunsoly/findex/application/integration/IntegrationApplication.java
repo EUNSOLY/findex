@@ -44,7 +44,7 @@ public class IntegrationApplication {
                 command.baseDateFrom(), command.baseDateTo(), command.worker(), command.jobTimeFrom(), command.jobTimeTo(), command.status(),
                 cursorRequest.idAfter(), cursorRequest.cursor(), cursorRequest.sortField(), cursorRequest.sortDirection(), cursorRequest.size());
 
-        IntegrationHistoryCursorResult historyCursorResult = integrationHistoryService.findSyncJobHistories(condition);
+        IntegrationHistoryCursorResult historyCursorResult = integrationHistoryService.searchSyncJobHistories(condition);
 
         List<SyncIndexResult> syncIndexResults =
                 historyCursorResult.histories().stream().map(history -> SyncIndexResult.of(history, history.getIndexInformation())).toList();
