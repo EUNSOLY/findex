@@ -1,6 +1,9 @@
 package com.eunsoly.findex.domain.service.index;
 
 import com.eunsoly.findex.domain.entity.index.IndexInformation;
+import com.eunsoly.findex.repository.index.IndexInformationSearchCondition;
+import com.eunsoly.findex.repository.index.IndexInformationSummary;
+
 import java.util.List;
 
 public interface IndexInformationService {
@@ -10,4 +13,12 @@ public interface IndexInformationService {
     IndexInformation upsert(IndexInformation entity);
 
     List<IndexInformation> findSyncTargets(List<Long> ids);
+
+    IndexInformation findById(Long id);
+
+    void deleteInformation(Long id);
+
+    List<IndexInformationSummary> findSummariesAll();
+
+    IndexInformationCursorResult searchIndexInformations(IndexInformationSearchCondition condition);
 }

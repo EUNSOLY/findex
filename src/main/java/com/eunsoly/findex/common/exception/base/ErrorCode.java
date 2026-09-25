@@ -18,7 +18,9 @@ public enum ErrorCode {
     // 시스템 오류 (5xx)
     DATABASE_ERROR(Level.ERROR, 500, "SYS_001", "데이터베이스 오류가 발생했습니다"),
     EXTERNAL_API_ERROR(Level.ERROR, 500, "SYS_002", "외부 API 호출에 실패했습니다"),
-    INTERNAL_SERVER_ERROR(Level.ERROR, 500, "SYS_999", "내부 서버 오류가 발생했습니다");
+    INTERNAL_SERVER_ERROR(Level.ERROR, 500, "SYS_999", "내부 서버 오류가 발생했습니다"),
+
+    INDEX_INFO_NOT_FOUND(Level.WARN, 404, "INDEX_INFO_001", "지수정보가 존재하지 않습니다.");
 
     Level level;
     int httpStatus;
