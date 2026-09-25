@@ -1,5 +1,7 @@
 package com.eunsoly.findex.domain.service.index;
 
+import com.eunsoly.findex.common.exception.base.ErrorCode;
+import com.eunsoly.findex.common.exception.index.IndexException;
 import com.eunsoly.findex.domain.entity.SourceType;
 import com.eunsoly.findex.domain.entity.index.IndexInformation;
 import com.eunsoly.findex.repository.index.IndexInformationRepository;
@@ -30,4 +32,12 @@ public class IndexInformationServiceImpl implements IndexInformationService {
     public List<IndexInformation> findSyncTargets(List<Long> ids) {
         return List.of();
     }
+
+    @Override
+    public IndexInformation findById(Long id) {
+        return indexInformationRepository.findById(id)
+                .orElseThrow(() -> new IndexException(ErrorCode.INDEX_INFO_NOT_FOUND, String.format("잘못된 지수 정보 입니다. 요청 지수정보 ID : %s", id)));
+    }
+
+
 }
