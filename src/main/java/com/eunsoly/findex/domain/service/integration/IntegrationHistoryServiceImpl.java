@@ -8,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -39,7 +40,7 @@ public class IntegrationHistoryServiceImpl implements IntegrationHistoryService 
 
     private String getLastSortValue(String sortField, IntegrationHistory integrationHistory) {
         if (sortField.equals("targetDate")) {
-            return integrationHistory.getTargetDate().toString();
+            return Optional.ofNullable(integrationHistory.getTargetDate()).map(String::valueOf).orElse("null");
         }
         return integrationHistory.getJobTime().toString();
     }

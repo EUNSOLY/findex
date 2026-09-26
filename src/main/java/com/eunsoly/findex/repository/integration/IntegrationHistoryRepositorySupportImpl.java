@@ -8,11 +8,12 @@ import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.ComparableExpressionBase;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import lombok.RequiredArgsConstructor;
+
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
-import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
 public class IntegrationHistoryRepositorySupportImpl implements IntegrationHistoryRepositorySupport {
@@ -85,8 +86,13 @@ public class IntegrationHistoryRepositorySupportImpl implements IntegrationHisto
 
         return switch (condition.sortField()) {
             case "targetDate" -> {
+                if (condition.cursor().contains("null")) {
+                    yield isDesc ? integrationHistory.id.lt(condition.idAfter()) : integrationHistory.id.gt(condition.idAfter());
+                }
+
                 LocalDateTime localDateTime = LocalDateTime.parse(condition.cursor(), DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS"));
                 LocalDate localDate = localDateTime.toLocalDate();
+
                 yield isDesc
                         ? integrationHistory.targetDate.lt(localDate)
                                 .or(integrationHistory.targetDate.eq(localDate).and(integrationHistory.id.lt(condition.idAfter())))
@@ -94,13 +100,14 @@ public class IntegrationHistoryRepositorySupportImpl implements IntegrationHisto
                                 .or(integrationHistory.targetDate.eq(localDate).and(integrationHistory.id.gt(condition.idAfter())));
             }
             case "jobTime" -> isDesc
-                    ? integrationHistory.jobTime.stringValue().lt(condition.cursor())
-                            .or(integrationHistory.jobType.stringValue().eq(condition.cursor()).and(integrationHistory.id.lt(condition.idAfter())))
-                    : integrationHistory.jobTime.stringValue().gt(condition.cursor())
-                            .or(integrationHistory.jobType.stringValue().eq(condition.cursor()).and(integrationHistory.id.gt(condition.idAfter())));
+                    ? integrationHistory.jobTime.lt(LocalDateTime.parse(condition.cursor())).or(
+                            integrationHistory.jobTime.eq(LocalDateTime.parse(condition.cursor())).and(integrationHistory.id.lt(condition.idAfter())))
+                    : integrationHistory.jobTime.gt(LocalDateTime.parse(condition.cursor())).or(integrationHistory.jobTime
+                            .eq(LocalDateTime.parse(condition.cursor())).and(integrationHistory.id.gt(condition.idAfter())));
             default -> isDesc ? integrationHistory.id.lt(condition.idAfter()) : integrationHistory.id.gt(condition.idAfter());
         };
     }
+
 
     // 정렬
     private OrderSpecifier<?>[] orderSpecifiers(IntegrationHistorySearchCondition condition) {
