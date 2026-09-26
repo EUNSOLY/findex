@@ -23,9 +23,9 @@ public class IndexDataServiceImpl implements IndexDataService {
             if (existing.getSourceType().equals(SourceType.USER)) {
                 throw new IndexException(ErrorCode.DUPLICATE_INDEX_DATA, null);
             }
-            existing.updateByIntegration(entity.getMarketPrice(), existing.getClosingPrice(), existing.getHighPrice(), existing.getLowPrice(),
-                    existing.getVersus(), existing.getFluctuationRate(), existing.getTradingQuantity(), existing.getTradingPrice(),
-                    existing.getMarketTotalAmount());
+            existing.updateByIntegration(entity.getMarketPrice(), entity.getClosingPrice(), entity.getHighPrice(), entity.getLowPrice(),
+                    entity.getVersus(), entity.getFluctuationRate(), entity.getTradingQuantity(), entity.getTradingPrice(),
+                    entity.getMarketTotalAmount());
             return existing;
         }).orElseGet(() -> indexDataRepository.save(entity));
     }

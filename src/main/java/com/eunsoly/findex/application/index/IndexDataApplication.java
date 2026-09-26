@@ -3,6 +3,7 @@ package com.eunsoly.findex.application.index;
 import com.eunsoly.findex.application.index.dto.CreateIndexDataCommand;
 import com.eunsoly.findex.application.index.dto.IndexDataContent;
 import com.eunsoly.findex.application.index.dto.IndexDataResult;
+import com.eunsoly.findex.application.index.dto.UpdateIndexDataCommand;
 import com.eunsoly.findex.common.dto.CursorRequest;
 import com.eunsoly.findex.domain.entity.index.IndexData;
 import com.eunsoly.findex.domain.entity.index.IndexInformation;
@@ -50,5 +51,15 @@ public class IndexDataApplication {
     @Transactional
     public void delete(Long id) {
         indexDataService.deleteById(id);
+    }
+
+    @Transactional
+    public IndexDataContent update(UpdateIndexDataCommand command) {
+        IndexData updatedIndexData = indexDataService.findById(command.id());
+
+        updatedIndexData.updateByUser(command.marketPrice(), command.closingPrice(), command.highPrice(), command.lowPrice(), command.versus(),
+                command.fluctuationRate(), command.tradingQuantity(), command.tradingPrice(), command.marketTotalAmount());
+
+        return IndexDataContent.of(updatedIndexData);
     }
 }

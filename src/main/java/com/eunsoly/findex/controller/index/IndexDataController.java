@@ -5,15 +5,17 @@ import com.eunsoly.findex.application.index.IndexDataCommand;
 import com.eunsoly.findex.application.index.dto.CreateIndexDataCommand;
 import com.eunsoly.findex.application.index.dto.IndexDataContent;
 import com.eunsoly.findex.application.index.dto.IndexDataResult;
+import com.eunsoly.findex.application.index.dto.UpdateIndexDataCommand;
 import com.eunsoly.findex.common.dto.CursorPaginationResponse;
 import com.eunsoly.findex.common.dto.CursorPaginationResult;
 import com.eunsoly.findex.common.dto.CursorRequest;
-import com.eunsoly.findex.controller.index.dto.CreateIndexDataRequest;
 import com.eunsoly.findex.controller.index.dto.IndexDataResponse;
+import com.eunsoly.findex.controller.index.dto.UpsertIndexDataRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -52,7 +54,7 @@ public class IndexDataController {
 
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping(value = "/api/index-data")
-    public IndexDataResponse createIndexData(@RequestBody CreateIndexDataRequest request) {
+    public IndexDataResponse createIndexData(@RequestBody UpsertIndexDataRequest request) {
         CreateIndexDataCommand command = request.toCommand();
 
         IndexDataContent result = indexDataApplication.create(command);
@@ -65,5 +67,16 @@ public class IndexDataController {
     @DeleteMapping(value = "/api/index-data/{id}")
     public void deleteIndexData(@PathVariable Long id) {
         indexDataApplication.delete(id);
+    }
+
+    @ResponseStatus(HttpStatus.OK)
+    @PatchMapping(value = "/api/index-data/{id}")
+    public IndexDataResponse updateIndexData(@PathVariable Long id, @RequestBody UpsertIndexDataRequest request) {
+        UpdateIndexDataCommand command = request.toUpdatedCommand(id);
+
+        IndexDataContent result = indexDataApplication.update(command);
+
+
+        return IndexDataResponse.of(result);
     }
 }
