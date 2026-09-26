@@ -20,7 +20,9 @@ public enum ErrorCode {
     EXTERNAL_API_ERROR(Level.ERROR, 500, "SYS_002", "외부 API 호출에 실패했습니다"),
     INTERNAL_SERVER_ERROR(Level.ERROR, 500, "SYS_999", "내부 서버 오류가 발생했습니다"),
 
-    INDEX_INFO_NOT_FOUND(Level.WARN, 404, "INDEX_INFO_001", "지수정보가 존재하지 않습니다.");
+    NOT_FOUND_INDEX_INFO(Level.WARN, 404, "INDEX_INFO_001", "지수정보가 존재하지 않습니다."),
+
+    DUPLICATE_INDEX_DATA(Level.WARN, 409, "INDEX_DATA_001", "이미 존재하는 데이터 입니다.");
 
     Level level;
     int httpStatus;

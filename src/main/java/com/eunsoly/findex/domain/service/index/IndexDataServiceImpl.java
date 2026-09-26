@@ -1,6 +1,9 @@
 package com.eunsoly.findex.domain.service.index;
 
 import com.eunsoly.findex.common.dto.CursorPaginationResult;
+import com.eunsoly.findex.common.exception.base.ErrorCode;
+import com.eunsoly.findex.common.exception.index.IndexException;
+import com.eunsoly.findex.domain.entity.SourceType;
 import com.eunsoly.findex.domain.entity.index.IndexData;
 import com.eunsoly.findex.repository.index.IndexDataRepository;
 import com.eunsoly.findex.repository.index.IndexDataSearchCondition;
@@ -16,7 +19,15 @@ public class IndexDataServiceImpl implements IndexDataService {
 
     @Override
     public IndexData upsert(IndexData entity) {
-        return null;
+        return indexDataRepository.findByIndexInformationIdAndBaseDate(entity.getIndexInformation().getId(), entity.getBaseDate()).map(existing -> {
+            if (existing.getSourceType().equals(SourceType.USER)) {
+                throw new IndexException(ErrorCode.DUPLICATE_INDEX_DATA, null);
+            }
+            existing.updateByIntegration(entity.getMarketPrice(), existing.getClosingPrice(), existing.getHighPrice(), existing.getLowPrice(),
+                    existing.getVersus(), existing.getFluctuationRate(), existing.getTradingQuantity(), existing.getTradingPrice(),
+                    existing.getMarketTotalAmount());
+            return existing;
+        }).orElseGet(() -> indexDataRepository.save(entity));
     }
 
     @Override
@@ -57,3 +68,5 @@ public class IndexDataServiceImpl implements IndexDataService {
     }
 
 }
+
+
