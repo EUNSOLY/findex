@@ -53,6 +53,17 @@ public class IndexDataServiceImpl implements IndexDataService {
         return new IndexDataCursorResult(indexDataResult, cursorPaginationResult);
     }
 
+    @Override
+    public void deleteById(Long id) {
+        IndexData indexData = this.findById(id);
+        indexDataRepository.delete(indexData);
+    }
+
+    @Override
+    public IndexData findById(Long id) {
+        return indexDataRepository.findById(id).orElseThrow(() -> new IndexException(ErrorCode.NOT_FOUnd_INDEX_DATA, null));
+    }
+
 
     private String getLastSortValue(String sortField, IndexData indexData) {
         return switch (sortField) {

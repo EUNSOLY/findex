@@ -8,4 +8,8 @@ public interface IndexDataService {
     IndexData upsert(IndexData entity);
 
     IndexDataCursorResult searchIndexData(IndexDataSearchCondition condition);
+
+    void deleteById(Long id);
+
+    IndexData findById(Long id);
 }

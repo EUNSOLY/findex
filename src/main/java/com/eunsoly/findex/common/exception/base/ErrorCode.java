@@ -22,7 +22,8 @@ public enum ErrorCode {
 
     NOT_FOUND_INDEX_INFO(Level.WARN, 404, "INDEX_INFO_001", "지수정보가 존재하지 않습니다."),
 
-    DUPLICATE_INDEX_DATA(Level.WARN, 409, "INDEX_DATA_001", "이미 존재하는 데이터 입니다.");
+    DUPLICATE_INDEX_DATA(Level.WARN, 409, "INDEX_DATA_001", "이미 존재하는 데이터 입니다."),
+    NOT_FOUnd_INDEX_DATA(Level.WARN, 404, "INDEX_INFO_001", "지수데이터가 존재하지 않습니다.");
 
     Level level;
     int httpStatus;

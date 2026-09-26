@@ -46,4 +46,9 @@ public class IndexDataApplication {
 
         return IndexDataContent.of(savedIndexData);
     }
+
+    @Transactional
+    public void delete(Long id) {
+        indexDataService.deleteById(id);
+    }
 }

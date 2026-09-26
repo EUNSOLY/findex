@@ -12,7 +12,9 @@ import com.eunsoly.findex.controller.index.dto.CreateIndexDataRequest;
 import com.eunsoly.findex.controller.index.dto.IndexDataResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -59,5 +61,9 @@ public class IndexDataController {
 
     }
 
-    ;
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @DeleteMapping(value = "/api/index-data/{id}")
+    public void deleteIndexData(@PathVariable Long id) {
+        indexDataApplication.delete(id);
+    }
 }
