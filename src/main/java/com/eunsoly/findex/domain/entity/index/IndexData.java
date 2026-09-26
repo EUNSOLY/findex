@@ -1,6 +1,5 @@
 package com.eunsoly.findex.domain.entity.index;
 
-import com.eunsoly.findex.domain.entity.SourceType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;

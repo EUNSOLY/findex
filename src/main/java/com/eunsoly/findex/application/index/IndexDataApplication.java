@@ -1,12 +1,14 @@
 package com.eunsoly.findex.application.index;
 
 import com.eunsoly.findex.application.index.dto.CreateIndexDataCommand;
+import com.eunsoly.findex.application.index.dto.IndexChartResult;
 import com.eunsoly.findex.application.index.dto.IndexDataContent;
 import com.eunsoly.findex.application.index.dto.IndexDataResult;
 import com.eunsoly.findex.application.index.dto.UpdateIndexDataCommand;
 import com.eunsoly.findex.common.dto.CursorRequest;
 import com.eunsoly.findex.domain.entity.index.IndexData;
 import com.eunsoly.findex.domain.entity.index.IndexInformation;
+import com.eunsoly.findex.domain.service.index.IndexChartDataResult;
 import com.eunsoly.findex.domain.service.index.IndexDataCursorResult;
 import com.eunsoly.findex.domain.service.index.IndexDataService;
 import com.eunsoly.findex.domain.service.index.IndexInformationService;
@@ -61,5 +63,17 @@ public class IndexDataApplication {
                 command.fluctuationRate(), command.tradingQuantity(), command.tradingPrice(), command.marketTotalAmount());
 
         return IndexDataContent.of(updatedIndexData);
+    }
+
+    @Transactional(readOnly = true)
+    public IndexChartResult getIndexChart(Long indexInformationId, String periodType) {
+        IndexInformation indexInfo = indexInformationService.findById(indexInformationId);
+
+        IndexChartDataResult result = indexDataService.getChartData(indexInformationId, periodType);
+
+
+        return IndexChartResult.of(indexInfo.getId(), indexInfo.getIndexClassification(), indexInfo.getIndexName(), periodType, result);
+
+
     }
 }

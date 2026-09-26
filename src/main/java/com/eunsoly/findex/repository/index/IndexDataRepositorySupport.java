@@ -10,4 +10,5 @@ public interface IndexDataRepositorySupport {
     List<IndexData> searchIndexData(IndexDataSearchCondition condition);
 
     Long count(IndexDataSearchCondition condition);
+
 }

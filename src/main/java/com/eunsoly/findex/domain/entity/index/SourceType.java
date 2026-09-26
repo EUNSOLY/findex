@@ -1,4 +1,4 @@
-package com.eunsoly.findex.domain.entity;
+package com.eunsoly.findex.domain.entity.index;
 
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -21,6 +21,7 @@ public enum SourceType {
                 return sourceType;
             }
         }
+        // TODO : 커스텀 예외 생성하기
         throw new RuntimeException("");
     }
 }

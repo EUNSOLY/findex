@@ -1,6 +1,5 @@
 package com.eunsoly.findex.domain.entity.index;
 
-import com.eunsoly.findex.domain.entity.SourceType;
 import com.eunsoly.findex.domain.entity.integration.IntegrationConfig;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;

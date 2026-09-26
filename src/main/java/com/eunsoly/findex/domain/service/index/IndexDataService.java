@@ -12,4 +12,6 @@ public interface IndexDataService {
     void deleteById(Long id);
 
     IndexData findById(Long id);
+
+    IndexChartDataResult getChartData(Long indexInformationId, String periodType);
 }

@@ -1,7 +1,7 @@
 package com.eunsoly.findex.application.index.dto;
 
-import com.eunsoly.findex.domain.entity.SourceType;
 import com.eunsoly.findex.domain.entity.index.IndexInformation;
+import com.eunsoly.findex.domain.entity.index.SourceType;
 
 import java.time.LocalDate;
 

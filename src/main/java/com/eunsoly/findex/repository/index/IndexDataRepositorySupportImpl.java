@@ -33,6 +33,7 @@ public class IndexDataRepositorySupportImpl implements IndexDataRepositorySuppor
         return jpaQueryFactory.select(indexData.count()).from(indexData).where(this.filterConditions(condition)).fetchOne();
     }
 
+
     // 조건절1.
     private BooleanBuilder filterConditions(IndexDataSearchCondition condition) {
         QIndexData indexData = QIndexData.indexData;
