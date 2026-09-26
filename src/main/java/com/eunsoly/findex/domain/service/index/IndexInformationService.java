@@ -21,4 +21,8 @@ public interface IndexInformationService {
     List<IndexInformationSummary> findSummariesAll();
 
     IndexInformationCursorResult searchIndexInformations(IndexInformationSearchCondition condition);
+
+    List<IndexInformation> getFavoriteIndexInfos();
+
+    List<IndexInformation> findAll();
 }

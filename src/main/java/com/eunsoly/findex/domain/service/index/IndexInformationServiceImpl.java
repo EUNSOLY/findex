@@ -76,6 +76,17 @@ public class IndexInformationServiceImpl implements IndexInformationService {
         return new IndexInformationCursorResult(resultIndexInformations, cursorPaginationResult);
     }
 
+    @Override
+    public List<IndexInformation> getFavoriteIndexInfos() {
+        return indexInformationRepository.findByFavoriteTrue();
+    }
+
+    @Override
+    public List<IndexInformation> findAll() {
+        return indexInformationRepository.findAll();
+    }
+
+
     private String getLastSortValue(String sortField, IndexInformation indexInformation) {
         return switch (sortField) {
             case "indexName" -> indexInformation.getIndexName();

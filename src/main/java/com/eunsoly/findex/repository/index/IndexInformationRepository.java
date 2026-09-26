@@ -14,4 +14,5 @@ public interface IndexInformationRepository extends JpaRepository<IndexInformati
     List<IndexInformation> findByIdIn(List<Long> ids);
 
 
+    List<IndexInformation> findByFavoriteTrue();
 }

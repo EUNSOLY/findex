@@ -6,6 +6,7 @@ import com.eunsoly.findex.common.exception.index.IndexException;
 import com.eunsoly.findex.domain.entity.index.IndexData;
 import com.eunsoly.findex.domain.entity.index.PeriodType;
 import com.eunsoly.findex.domain.entity.index.SourceType;
+import com.eunsoly.findex.repository.index.IndexDataRankPair;
 import com.eunsoly.findex.repository.index.IndexDataRepository;
 import com.eunsoly.findex.repository.index.IndexDataSearchCondition;
 import lombok.RequiredArgsConstructor;
@@ -72,9 +73,8 @@ public class IndexDataServiceImpl implements IndexDataService {
 
     @Override
     public IndexChartDataResult getChartData(Long indexInformationId, String periodType) {
-        PeriodType type = PeriodType.of(periodType);
         LocalDate endDate = LocalDate.now(ZoneId.of("Asia/Seoul"));
-        LocalDate startDate = getFromDate(endDate, type);
+        LocalDate startDate = getFromDate(endDate, periodType);
 
         List<IndexData> indexData =
                 indexDataRepository.findByIndexInformationIdAndBaseDateBetweenOrderByBaseDateDesc(indexInformationId, startDate, endDate);
@@ -83,6 +83,25 @@ public class IndexDataServiceImpl implements IndexDataService {
         List<ChartData> ma20 = this.calculateMovingAverage(indexData, 20);
 
         return IndexChartDataResult.of(base, ma5, ma20);
+    }
+
+    @Override
+    public List<Performance> getIndexRanking(Long indexInfoId, String periodType, Integer limit) {
+        LocalDate today = LocalDate.now(ZoneId.of("Asia/Seoul"));
+        LocalDate diffDay = this.getFromDate(today, periodType);
+
+        List<IndexDataRankPair> pairIndexData = indexDataRepository.findTopRank(indexInfoId, today, diffDay, limit);
+
+        return pairIndexData.stream().map(pairMap -> {
+            IndexData current = pairMap.current();
+            IndexData before = pairMap.before();
+
+            BigDecimal versus = current.getClosingPrice().subtract(before.getClosingPrice());
+            BigDecimal fluctuationRate = versus.divide(before.getClosingPrice(), 4, RoundingMode.HALF_UP).multiply(BigDecimal.valueOf(100));
+
+            return Performance.of(current.getIndexInformation().getId(), current.getIndexInformation().getIndexClassification(),
+                    current.getIndexInformation().getIndexName(), versus, fluctuationRate, current.getClosingPrice(), before.getClosingPrice());
+        }).toList();
     }
 
     private List<ChartData> calculateMovingAverage(List<IndexData> sorted, Integer windowSize) {
@@ -103,12 +122,14 @@ public class IndexDataServiceImpl implements IndexDataService {
     }
 
 
-    private LocalDate getFromDate(LocalDate today, PeriodType type) {
-        return switch (type) {
+    private LocalDate getFromDate(LocalDate today, String type) {
+        PeriodType periodType = PeriodType.of(type);
+        return switch (periodType) {
             case MONTHLY -> today.minusMonths(1);
             case QUARTERLY -> today.minusMonths(3);
             case YEARLY -> today.minusYears(1);
-            default -> today;
+            case WEEKLY -> today.minusWeeks(1);
+            case DAILY -> today.minusDays(1);
         };
     }
 

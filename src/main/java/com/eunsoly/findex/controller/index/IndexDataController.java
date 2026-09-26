@@ -5,12 +5,14 @@ import com.eunsoly.findex.application.index.IndexDataCommand;
 import com.eunsoly.findex.application.index.dto.CreateIndexDataCommand;
 import com.eunsoly.findex.application.index.dto.IndexChartResult;
 import com.eunsoly.findex.application.index.dto.IndexDataContent;
+import com.eunsoly.findex.application.index.dto.IndexDataRankingResult;
 import com.eunsoly.findex.application.index.dto.IndexDataResult;
 import com.eunsoly.findex.application.index.dto.UpdateIndexDataCommand;
 import com.eunsoly.findex.common.dto.CursorPaginationResponse;
 import com.eunsoly.findex.common.dto.CursorPaginationResult;
 import com.eunsoly.findex.common.dto.CursorRequest;
 import com.eunsoly.findex.controller.index.dto.IndexChartResponse;
+import com.eunsoly.findex.controller.index.dto.IndexDataRankResponse;
 import com.eunsoly.findex.controller.index.dto.IndexDataResponse;
 import com.eunsoly.findex.controller.index.dto.UpsertIndexDataRequest;
 import lombok.RequiredArgsConstructor;
@@ -82,7 +84,6 @@ public class IndexDataController {
         return IndexDataResponse.of(result);
     }
 
-
     @ResponseStatus(HttpStatus.OK)
     @GetMapping("/api/index-data/{id}/chart")
     public IndexChartResponse getIndexChart(@PathVariable(value = "id") Long indexInformationId,
@@ -92,4 +93,14 @@ public class IndexDataController {
         return IndexChartResponse.of(result);
     }
 
+    @ResponseStatus(HttpStatus.OK)
+    @GetMapping("/api/index-data/performance/rank")
+    public List<IndexDataRankResponse> getIndexRanking(@RequestParam(required = false) Long indexInfoId,
+            @RequestParam(required = false, defaultValue = "DAILY") String periodType,
+            @RequestParam(required = false, defaultValue = "10") Integer limit) {
+
+        List<IndexDataRankingResult> rankingResults = indexDataApplication.getIndexDataRanking(indexInfoId, periodType, limit);
+
+        return rankingResults.stream().map(IndexDataRankResponse::of).toList();
+    }
 }
