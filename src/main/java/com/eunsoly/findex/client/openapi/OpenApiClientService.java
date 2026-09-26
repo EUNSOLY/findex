@@ -5,10 +5,11 @@ import com.eunsoly.findex.application.index.dto.CreateIndexInformationCommand;
 import com.eunsoly.findex.application.index.port.ExternalIndexProvider;
 import com.eunsoly.findex.application.integration.dto.IndexDataPage;
 import com.eunsoly.findex.client.openapi.dto.OpenApiResponse;
-import java.util.ArrayList;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -54,7 +55,7 @@ public class OpenApiClientService implements ExternalIndexProvider {
         OpenApiResponse.Items items = res.getItems();
         List<CreateIndexDataCommand> commands = items.getItems().stream().filter(item -> item.getIndexClassification().equals(indexClassification))
                 .map(item -> CreateIndexDataCommand.of(null, item.getBaseDate(), item.getMarketPrice(), item.getClosingPrice(), item.getHighPrice(),
-                        item.getLowPrice(), item.getVersus(), item.getFluctuationRage(), item.getTradingQuantity(), item.getTradingPrice(),
+                        item.getLowPrice(), item.getVersus(), item.getFluctuationRate(), item.getTradingQuantity(), item.getTradingPrice(),
                         item.getMarketTotalAmount()))
                 .toList();
 

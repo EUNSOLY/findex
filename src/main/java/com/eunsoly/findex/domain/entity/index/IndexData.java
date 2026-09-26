@@ -59,7 +59,7 @@ public class IndexData {
     private BigDecimal versus; // 대비
 
     @Column(nullable = false)
-    private BigDecimal fluctuationRage; // 등락률
+    private BigDecimal fluctuationRate; // 등락률
 
     @Column(nullable = false)
     private Long tradingQuantity; // 거래량
@@ -81,7 +81,7 @@ public class IndexData {
         indexData.highPrice = highPrice;
         indexData.lowPrice = lowPrice;
         indexData.versus = versus;
-        indexData.fluctuationRage = fluctuationRate;
+        indexData.fluctuationRate = fluctuationRate;
         indexData.tradingQuantity = tradingQuantity;
         indexData.tradingPrice = tradingPrice;
         indexData.marketTotalAmount = marketTotalAmount;
@@ -132,7 +132,7 @@ public class IndexData {
         this.highPrice = highPrice;
         this.lowPrice = lowPrice;
         this.versus = versus;
-        this.fluctuationRage = fluctuationRate;
+        this.fluctuationRate = fluctuationRate;
         this.tradingQuantity = tradingQuantity;
         this.tradingPrice = tradingPrice;
         this.marketTotalAmount = marketTotalAmount;

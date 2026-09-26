@@ -3,11 +3,12 @@ package com.eunsoly.findex.client.openapi.dto;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.Getter;
+import lombok.Setter;
+
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
-import lombok.Getter;
-import lombok.Setter;
 
 @Getter
 @Setter
@@ -87,7 +88,7 @@ public class OpenApiResponse {
         private BigDecimal versus; // 대비
 
         @JsonProperty("fltRt")
-        private BigDecimal fluctuationRage; // 등락률
+        private BigDecimal fluctuationRate; // 등락률
 
         @JsonProperty("mkp")
         private BigDecimal marketPrice; // 시가
