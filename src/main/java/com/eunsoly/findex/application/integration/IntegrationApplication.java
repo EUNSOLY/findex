@@ -18,20 +18,21 @@ import com.eunsoly.findex.domain.service.index.IndexInformationService;
 import com.eunsoly.findex.domain.service.integration.IntegrationHistoryCursorResult;
 import com.eunsoly.findex.domain.service.integration.IntegrationHistoryService;
 import com.eunsoly.findex.repository.integration.IntegrationHistorySearchCondition;
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.support.TransactionTemplate;
+
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class IntegrationApplication {
 
-    private final String CREATE_TYPE = "OPEN_API";
+    private static final String CREATE_TYPE = "OPEN_API";
     private static final int CHUNK_SIZE = 100;
     private final TransactionTemplate transactionTemplate;
     private final ExternalIndexProvider indexInformationProvider;
@@ -118,7 +119,6 @@ public class IntegrationApplication {
             IndexDataPage page;
             String indexName = indexInformation.getIndexName();
             String indexClassification = indexInformation.getIndexClassification();
-
             do {
                 try {
                     // 2. IndexInformation을의 indexName을 OpenAPI에 전달하여 OpenAPI를 호출한다. (반복 호출)
@@ -155,12 +155,12 @@ public class IntegrationApplication {
             return transactionTemplate.execute(status -> {
                 List<SyncIndexResult> results = new ArrayList<>(); // 람다 안으로
                 for (CreateIndexDataCommand item : items) {
-                    IndexData savedIndexData = indexDataService.upsert(item.toEntity(CREATE_TYPE));
+                    IndexData savedIndexData = indexDataService.upsert(item.toEntity(indexInformation, CREATE_TYPE));
                     IntegrationHistoryCommand historyCommand =
-                            IntegrationHistoryCommand.of(item.indexInformation(), savedIndexData.getBaseDate(), clientIp, jobTime);
+                            IntegrationHistoryCommand.of(indexInformation, savedIndexData.getBaseDate(), clientIp, jobTime);
                     IntegrationHistory history = historyCommand.toEntity("INDEX_DATA", true);
                     IntegrationHistory savedHistory = integrationHistoryService.saveSuccess(history);
-                    results.add(SyncIndexResult.of(savedHistory, item.indexInformation()));
+                    results.add(SyncIndexResult.of(savedHistory, indexInformation));
                 }
                 return results;
             });
@@ -177,7 +177,7 @@ public class IntegrationApplication {
         for (CreateIndexDataCommand command : items) {
             try {
                 results.add(transactionTemplate.execute(status -> {
-                    IndexData saved = indexDataService.upsert(command.toEntity(CREATE_TYPE));
+                    IndexData saved = indexDataService.upsert(command.toEntity(indexInformation, CREATE_TYPE));
                     IntegrationHistory history =
                             IntegrationHistoryCommand.of(indexInformation, saved.getBaseDate(), clientIp, jobTime).toEntity("INDEX_DATA", true);
                     return SyncIndexResult.of(integrationHistoryService.saveSuccess(history), indexInformation);
